@@ -1,0 +1,31 @@
+using Example.Projects.Stubs;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Zonit.Extensions.Projects;
+using Zonit.Extensions.Website;
+
+namespace Example;
+
+public sealed class ProjectsArea : IWebsiteArea, IWebsiteServices
+{
+    public string Key => "projects";
+
+    public void ConfigureServices(IServiceCollection services)
+    {
+        services.TryAddScoped<IProjectSource, InMemoryOrganizationProjectManager>();
+    }
+
+    public IReadOnlyList<NavGroup> Navigation { get; } = new[]
+    {
+        new NavGroup
+        {
+            Title = "Projects",
+            Order = 40,
+            Children =
+            [
+                new NavItem { Title = "Catalog",  Url = "/projects" },
+                new NavItem { Title = "Switcher", Url = "/projects/switcher" },
+            ],
+        },
+    };
+}
