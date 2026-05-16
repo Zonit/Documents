@@ -1,0 +1,30 @@
+<Project>
+  <!--
+    Shared defaults for every demo project under Source/Extensions.* and the host
+    under Source/Documents/. Migrated 1:1 from the Sdk-side Example/Directory.Build.props
+    so renamed projects keep building once Documents is mounted as a submodule under
+    Sdk/Source/Documents/Zonit.Documents/.
+
+    Library packages elsewhere in Sdk stay strict (trim/AOT analyzers ON, doc-file
+    generation ON, central versioning); this tree is the permissive demo side.
+  -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+
+    <!-- Demos are never published as NuGet. -->
+    <IsPackable>false</IsPackable>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+
+    <!-- Demo wires reflection-heavy bits (EditForm + DataAnnotations + tenant settings).
+         The libraries themselves stay AOT-clean; the demo doesn't. -->
+    <IsTrimmable>false</IsTrimmable>
+    <IsAotCompatible>false</IsAotCompatible>
+    <EnableTrimAnalyzer>false</EnableTrimAnalyzer>
+    <EnableAotAnalyzer>false</EnableAotAnalyzer>
+
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+</Project>

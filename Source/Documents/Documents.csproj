@@ -1,0 +1,46 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <!-- Framework + language settings declared inline (the root Directory.Build.props
+         only carries workspace-wide flags, not per-project framework). -->
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <RootNamespace>Documents</RootNamespace>
+    <AssemblyName>Documents</AssemblyName>
+
+    <Description>End-to-end demo host for every Zonit.Extensions package.</Description>
+
+    <IsPackable>false</IsPackable>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <IsTrimmable>false</IsTrimmable>
+    <IsAotCompatible>false</IsAotCompatible>
+    <EnableTrimAnalyzer>false</EnableTrimAnalyzer>
+    <EnableAotAnalyzer>false</EnableAotAnalyzer>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Core: pulls every domain transitively. -->
+    <ProjectReference Include="..\..\external\Zonit.Extensions\Source\Zonit.Extensions.Website\Zonit.Extensions.Website.csproj" />
+
+    <!-- Per-domain demo areas. Each is a standalone Razor class library that registers
+         its IWebsiteArea, ships its own pages, and demonstrates a slice of Zonit.Extensions.
+         A real consumer wires their feature areas the same way. -->
+    <ProjectReference Include="..\Extensions.Cultures\Extensions.Cultures.csproj" />
+    <ProjectReference Include="..\Extensions.Auth\Extensions.Auth.csproj" />
+    <ProjectReference Include="..\Extensions.Organizations\Extensions.Organizations.csproj" />
+    <ProjectReference Include="..\Extensions.Projects\Extensions.Projects.csproj" />
+    <ProjectReference Include="..\Extensions.Tenants\Extensions.Tenants.csproj" />
+    <ProjectReference Include="..\Extensions.Components\Extensions.Components.csproj" />
+    <ProjectReference Include="..\Extensions.ValueObjects\Extensions.ValueObjects.csproj" />
+    <ProjectReference Include="..\Extensions.MudBlazor\Extensions.MudBlazor.csproj" />
+    <ProjectReference Include="..\Extensions.Shared\Extensions.Shared.csproj" />
+
+    <!-- Zonit.Dashboard 10.0.0-preview1 demo mount.
+         Resolved through Zonit.Sdk's sibling submodules: Documents lives at
+         Sdk/Source/Documents/Zonit.Documents and Dashboard at
+         Sdk/Source/Services/Zonit.Services.Dashboard. -->
+    <ProjectReference Include="..\..\external\Zonit.Services.Dashboard\Source\Zonit.Dashboard\Zonit.Dashboard.csproj" />
+  </ItemGroup>
+</Project>
