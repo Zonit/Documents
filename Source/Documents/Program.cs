@@ -29,14 +29,7 @@ builder.Services.AddWebsite(opts =>
 // Registers IThemeManager, IExtensionRegistry, IDashboardCurrentSite, all built-in
 // themes, the theme-selector drawer extension, and the layout-by-key bindings
 // ("Dashboard.Main" / "Zonit.Minimal").
-//
-// Guarded by ZONIT_DASHBOARD_AVAILABLE (defined in Documents.csproj iff the
-// external/Zonit.Services.Dashboard submodule contains Source/Zonit.Dashboard/).
-// Until the submodule is synced past the rewrite commit, the host runs without
-// the /admin mount instead of failing to compile.
-#if ZONIT_DASHBOARD_AVAILABLE
 builder.Services.AddDashboard();
-#endif
 
 // ─── Cultures: supported list drives the language switcher and Accept-Language fallback.
 builder.Services.Configure<CultureOption>(o =>
@@ -69,27 +62,6 @@ var app = builder.Build();
 // UseDashboard is signature-compatible with UseWebsite<TApp> but the TApp generic
 // is gone — the dashboard ships its own root component (DashboardApp). Layout
 // knobs / extension whitelists / SiteOptions mirrors all live on DashboardSiteOptions.
-//
-// See the matching #if around AddDashboard() above for the conditional rationale.
-#if ZONIT_DASHBOARD_AVAILABLE
-app.UseDashboard("/admin", o =>
-{
-    // Same dev-friendly overrides as the root site below.
-    o.Compression = !builder.Environment.IsDevelopment();
-    o.HttpsRedirection = !builder.Environment.IsDevelopment();
-
-    // Mount the same content areas under /admin so the dashboard drawer has
-    // navigation entries to show. Real consumers would mount a dedicated set of
-    // admin-only areas here instead.
-    o.AddArea<ComponentsArea>();
-    o.AddArea<MudBlazorArea>();
-    o.AddArea<ValueObjectsArea>();
-
-    // Demo overrides of the per-mount layout knobs.
-    o.Layout.LeftDrawerWidth = 260;
-    o.Layout.ShowBreadcrumbs = true;
-});
-#endif
 
 app.UseWebsite<App>("/", o =>
 {
@@ -108,6 +80,24 @@ app.UseWebsite<App>("/", o =>
     o.AddArea<ComponentsArea>();
     o.AddArea<ValueObjectsArea>();
     o.AddArea<MudBlazorArea>();
+});
+
+app.UseDashboard("/admin", o =>
+{
+    // Same dev-friendly overrides as the root site below.
+    o.Compression = !builder.Environment.IsDevelopment();
+    o.HttpsRedirection = !builder.Environment.IsDevelopment();
+
+    // Mount the same content areas under /admin so the dashboard drawer has
+    // navigation entries to show. Real consumers would mount a dedicated set of
+    // admin-only areas here instead.
+    o.AddArea<ComponentsArea>();
+    o.AddArea<MudBlazorArea>();
+    o.AddArea<ValueObjectsArea>();
+
+    // Demo overrides of the per-mount layout knobs.
+    o.Layout.LeftDrawerWidth = 260;
+    o.Layout.ShowBreadcrumbs = true;
 });
 
 app.Run();

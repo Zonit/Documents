@@ -22,7 +22,7 @@
 
   <ItemGroup>
     <!-- Core: pulls every domain transitively. -->
-    <ProjectReference Include="..\..\external\Zonit.Extensions\Source\Zonit.Extensions.Website\Zonit.Extensions.Website.csproj" />
+    <ProjectReference Include="..\..\..\..\Extensions\Zonit.Extensions\Source\Zonit.Extensions.Website\Zonit.Extensions.Website.csproj" />
 
     <!-- Per-domain demo areas. Each is a standalone Razor class library that registers
          its IWebsiteArea, ships its own pages, and demonstrates a slice of Zonit.Extensions.
@@ -38,9 +38,9 @@
     <ProjectReference Include="..\Extensions.Shared\Extensions.Shared.csproj" />
 
     <!-- Zonit.Dashboard 10.0.0-preview1 demo mount.
-         Resolved through Zonit.Sdk's sibling submodules: Documents lives at
-         Sdk/Source/Documents/Zonit.Documents and Dashboard at
-         Sdk/Source/Services/Zonit.Services.Dashboard. -->
-    <ProjectReference Include="..\..\external\Zonit.Services.Dashboard\Source\Zonit.Dashboard\Zonit.Dashboard.csproj" />
+         Documents lives at Sdk/Source/Documents/Zonit.Documents/, so 4 .. lands
+         on the Sdk root and \Services\Zonit.Services.Dashboard\... resolves the
+         live Dashboard project as a sibling submodule. -->
+    <ProjectReference Include="..\..\..\..\Services\Zonit.Services.Dashboard\Source\Zonit.Dashboard\Zonit.Dashboard.csproj" />
   </ItemGroup>
 </Project>

@@ -36,12 +36,16 @@ Zonit.Documents/                            (this repo, lives as a submodule)
 ## How the cross-repo references resolve
 
 Every demo project under `Source/Extensions.*` has a `<ProjectReference>` pointing
-five directories up and back down into Sdk's sibling submodules:
+four directories up and back down into Sdk's sibling submodules:
 
 ```xml
 <!-- Source/Extensions.Auth/Extensions.Auth.csproj -->
-<ProjectReference Include="..\..\..\..\..\Source\Extensions\Zonit.Extensions\Source\Zonit.Extensions.Website\Zonit.Extensions.Website.csproj" />
+<ProjectReference Include="..\..\..\..\Extensions\Zonit.Extensions\Source\Zonit.Extensions.Website\Zonit.Extensions.Website.csproj" />
 ```
+
+The four `..\` segments climb out of `Sdk/Source/Documents/Zonit.Documents/Source/Extensions.Auth/`
+and land on `Sdk/Source/`, from where `Extensions/Zonit.Extensions/...` and
+`Services/Zonit.Services.Dashboard/...` are immediate siblings.
 
 That path resolves only when this repo lives at `Sdk/Source/Documents/Zonit.Documents/`,
 which is why standalone checkouts do not build. Opening the solution while the Sdk

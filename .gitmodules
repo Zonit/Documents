@@ -1,6 +1,0 @@
-[submodule "external/Zonit.Extensions"]
-	path = external/Zonit.Extensions
-	url = https://github.com/Zonit/Zonit.Extensions
-[submodule "external/Zonit.Services.Dashboard"]
-	path = external/Zonit.Services.Dashboard
-	url = https://github.com/Zonit/Zonit.Services.Dashboard

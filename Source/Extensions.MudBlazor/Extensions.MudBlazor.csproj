@@ -1,10 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk.Razor">
   <ItemGroup>
     <!-- The Website host (areas + page bases) -->
-    <ProjectReference Include="..\..\external\Zonit.Extensions\Source\Zonit.Extensions.Website\Zonit.Extensions.Website.csproj" />
+    <ProjectReference Include="..\..\..\..\Extensions\Zonit.Extensions\Source\Zonit.Extensions.Website\Zonit.Extensions.Website.csproj" />
 
     <!-- ZonitTextField / ZonitTextArea -->
-    <ProjectReference Include="..\..\external\Zonit.Extensions\Source\Zonit.Extensions.Website.MudBlazor\Zonit.Extensions.Website.MudBlazor.csproj" />
+    <ProjectReference Include="..\..\..\..\Extensions\Zonit.Extensions\Source\Zonit.Extensions.Website.MudBlazor\Zonit.Extensions.Website.MudBlazor.csproj" />
   </ItemGroup>
 
   <ItemGroup>
