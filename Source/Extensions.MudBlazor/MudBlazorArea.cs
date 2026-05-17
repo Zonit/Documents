@@ -1,3 +1,4 @@
+using Extensions.MudBlazor.Pages;
 using Microsoft.Extensions.DependencyInjection;
 using MudBlazor.Services;
 using Zonit.Extensions.Website;
@@ -20,16 +21,16 @@ public sealed class MudBlazorArea : IWebsiteArea, IWebsiteServices
         services.AddMudServices();
     }
 
-    public IReadOnlyList<NavGroup> Navigation { get; } = new[]
-    {
+    public IReadOnlyList<NavGroup> Navigation { get; } =
+    [
         new NavGroup
         {
             Title = "MudBlazor",
             Order = 80,
             Children =
             [
-                new NavItem { Title = "VO-bound form", Url = "/mudblazor/forms" },
+                new NavItem { Title = "VO-bound form", Url = Forms.Route },
             ],
         },
-    };
+    ];
 }

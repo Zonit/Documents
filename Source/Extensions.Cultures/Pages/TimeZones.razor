@@ -1,49 +1,51 @@
-@page "/cultures/time-zone"
 @rendermode InteractiveServer
 @inherits PageBase
 
-<h1>Time zones</h1>
+<PageTitle>@T("Time zones")</PageTitle>
 
-<p>
-    The <code>TimeZone</code> value object accepts IANA identifiers, Windows IDs, and
-    fixed offsets (<code>(int)</code>). <code>ICultureProvider.ClientTimeZone(utc)</code>
-    converts a <code>DateTime</code> in UTC to the user's selected zone.
-</p>
+<MudText Typo="Typo.h3" GutterBottom="true">@T("Time zones")</MudText>
 
-<section class="card">
-    <h2>Switch zone</h2>
-    <select @onchange="OnZoneChanged" value="@CultureManager.TimeZone.Value">
-        @foreach (var tz in TimeZoneInfo.GetSystemTimeZones())
-        {
-            <option value="@tz.Id">@tz.DisplayName</option>
-        }
-    </select>
-</section>
+<MudText Class="mb-4">
+    @T("The TimeZone value object accepts IANA identifiers, Windows IDs, and fixed offsets ((int)). ICultureProvider.ClientTimeZone(utc) converts a DateTime in UTC to the user's selected zone.")
+</MudText>
 
-<section class="card">
-    <h2>Now</h2>
-    <dl>
-        <dt>UTC</dt>      <dd>@DateTime.UtcNow.ToString("u")</dd>
-        <dt>Zone</dt>     <dd>@CultureManager.TimeZone.Value</dd>
-        <dt>Offset</dt>   <dd>@CultureManager.TimeZone.Offset</dd>
-        <dt>In zone</dt>  <dd>@Culture.ClientTimeZone(DateTime.UtcNow).ToString("u")</dd>
-    </dl>
-</section>
+<MudCard Outlined="true" Class="mb-4">
+    <MudCardContent>
+        <MudText Typo="Typo.h5" GutterBottom="true">@T("Switch zone")</MudText>
+        <MudSelect T="string" Value="@CultureManager.TimeZone.Value"
+                   ValueChanged="@(v => CultureManager.SetTimeZone(v))"
+                   Label="@T("Time zone")" Variant="Variant.Outlined" Dense="true">
+            @foreach (var tz in TimeZoneInfo.GetSystemTimeZones())
+            {
+                <MudSelectItem T="string" Value="@tz.Id">@tz.DisplayName</MudSelectItem>
+            }
+        </MudSelect>
+    </MudCardContent>
+</MudCard>
 
-<section class="card">
-    <h2>Implicit conversions</h2>
-    <pre>Zonit.Extensions.TimeZone tz = "Europe/Warsaw";   // IANA
+<MudCard Outlined="true" Class="mb-4">
+    <MudCardContent>
+        <MudText Typo="Typo.h5" GutterBottom="true">@T("Now")</MudText>
+        <MudSimpleTable Dense="true" Bordered="true">
+            <tbody>
+                <tr><td><strong>@T("UTC")</strong></td><td>@DateTime.UtcNow.ToString("u")</td></tr>
+                <tr><td><strong>@T("Zone")</strong></td><td>@CultureManager.TimeZone.Value</td></tr>
+                <tr><td><strong>@T("Offset")</strong></td><td>@CultureManager.TimeZone.Offset</td></tr>
+                <tr><td><strong>@T("In zone")</strong></td><td>@Culture.ClientTimeZone(DateTime.UtcNow).ToString("u")</td></tr>
+            </tbody>
+        </MudSimpleTable>
+    </MudCardContent>
+</MudCard>
+
+<MudCard Outlined="true">
+    <MudCardContent>
+        <MudText Typo="Typo.h5" GutterBottom="true">@T("Implicit conversions")</MudText>
+        <pre class="mud-elevation-1 pa-3" style="background:var(--mud-palette-background-grey);border-radius:4px;">@(@"Zonit.Extensions.TimeZone tz = ""Europe/Warsaw"";   // IANA
 Zonit.Extensions.TimeZone fixedOffset = 2;        // UTC+02:00
 TimeSpan offset = tz.Offset;                       // explicit query
-DateTime here = tz.ConvertFromUtc(DateTime.UtcNow);</pre>
-</section>
-
-@code {
-    [Inject] ICultureManager CultureManager { get; set; } = default!;
-
-    void OnZoneChanged(ChangeEventArgs e)
-    {
-        if (e.Value is string id)
-            CultureManager.SetTimeZone(id);
-    }
-}
+DateTime here = tz.ConvertFromUtc(DateTime.UtcNow);")</pre>
+        <MudText Class="mt-3">
+            @T("The TimeZone value object is AOT-friendly and JSON-serializable. Equality compares the canonical IANA id, so a fixed-offset zone created from an integer will not equal a named zone with the same offset.")
+        </MudText>
+    </MudCardContent>
+</MudCard>

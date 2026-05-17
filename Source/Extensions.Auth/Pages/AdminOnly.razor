@@ -1,8 +1,15 @@
-@page "/auth/admin-only"
-@using Zonit.Extensions.Website.Authentication
-@attribute [RequirePermission("settings.write")]
 @rendermode InteractiveServer
+@inherits PageBase
 
-<h1>Admin only</h1>
-<p>You see this because you hold <code>settings.write</code> (or a wildcard like <code>*</code>).</p>
-<p><a href="/auth/require-permission">← Back</a></p>
+<PageTitle>@T("Admin only")</PageTitle>
+
+<MudText Typo="Typo.h3" GutterBottom="true">@T("Admin only")</MudText>
+
+<MudAlert Severity="Severity.Success" Variant="Variant.Outlined" Class="mb-4">
+    @T("You see this because you hold settings.write (or a wildcard like '*').")
+</MudAlert>
+
+<MudButton Variant="Variant.Outlined" Href="@RequirePermissionDemo.Route"
+           StartIcon="@Icons.Material.Filled.ArrowBack">
+    @T("Back")
+</MudButton>

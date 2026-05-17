@@ -1,43 +1,48 @@
-@page "/organizations"
 @rendermode InteractiveServer
 @inherits PageBase
 
-<h1>Workspace</h1>
+<PageTitle>@T("Workspace")</PageTitle>
 
-<p>
-    <code>IWorkspaceProvider</code> exposes the current user's selected organization as
-    an <code>Organization</code> value object. Hydrated by <code>WorkspaceMiddleware</code>
-    from <code>IOrganizationSource</code> (the in-memory stub in this demo).
-</p>
+<MudText Typo="Typo.h3" GutterBottom="true">@T("Workspace")</MudText>
+
+<MudText Class="mb-4">
+    @T("IWorkspaceProvider exposes the current user's selected organization as an Organization value object. Hydrated by WorkspaceMiddleware from IOrganizationSource (the in-memory stub in this demo).")
+</MudText>
 
 @if (!Workspace.Organization.HasValue)
 {
-    <div class="alert">No organization selected. Log in first.</div>
+    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mb-4">
+        @T("No organization selected. Log in first.")
+    </MudAlert>
 }
 else
 {
-    <section class="card">
-        <h2>Current</h2>
-        <dl>
-            <dt>Id</dt>   <dd><code>@Workspace.Organization.Id</code></dd>
-            <dt>Name</dt> <dd>@Workspace.Organization.Name.Value</dd>
-            <dt>Slug</dt> <dd>@Workspace.Organization.Slug.Value</dd>
-        </dl>
-    </section>
+    <MudCard Outlined="true" Class="mb-4">
+        <MudCardContent>
+            <MudText Typo="Typo.h5" GutterBottom="true">@T("Current")</MudText>
+            <MudSimpleTable Dense="true" Bordered="true">
+                <tbody>
+                    <tr><td><strong>Id</strong></td><td><code>@Workspace.Organization.Id</code></td></tr>
+                    <tr><td><strong>@T("Name")</strong></td><td>@Workspace.Organization.Name.Value</td></tr>
+                    <tr><td><strong>@T("Slug")</strong></td><td>@Workspace.Organization.Slug.Value</td></tr>
+                </tbody>
+            </MudSimpleTable>
+        </MudCardContent>
+    </MudCard>
 }
 
-<section class="card">
-    <h2>Cross-domain reference</h2>
-    <p>
-        Use <code>Organization</code> as the type of foreign-key columns. The VO carries the
-        Id verbatim and the snapshot is hydrated on demand by
-        <code>Zonit.Extensions.Databases</code> (when wired) — no hidden I/O.
-    </p>
-    <pre>public sealed class Order
+<MudCard Outlined="true">
+    <MudCardContent>
+        <MudText Typo="Typo.h5" GutterBottom="true">@T("Cross-domain reference")</MudText>
+        <MudText Class="mb-3">
+            @T("Use Organization as the type of foreign-key columns. The VO carries the Id verbatim and the snapshot is hydrated on demand by Zonit.Extensions.Databases (when wired) — no hidden I/O.")
+        </MudText>
+        <pre class="mud-elevation-1 pa-3" style="background:var(--mud-palette-background-grey);border-radius:4px;">@(@"public sealed class Order
 {
     public Identity     Author       { get; init; }
     public Organization Organization { get; init; }   // ← VO; persisted as Guid
     public Project      Project      { get; init; }
     public Money        Total        { get; init; }
-}</pre>
-</section>
+}")</pre>
+    </MudCardContent>
+</MudCard>

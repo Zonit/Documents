@@ -1,39 +1,58 @@
-@page "/cultures/translation"
 @rendermode InteractiveServer
 @inherits PageBase
 
-<h1>Translations</h1>
+<PageTitle>@T("Translations")</PageTitle>
 
-<p>
-    Three idiomatic ways to translate a phrase. All return <code>Translated</code> — a
-    value object with implicit conversion to <code>string</code>, so it composes naturally
-    with HTML output.
-</p>
+<MudText Typo="Typo.h3" GutterBottom="true">@T("Translations")</MudText>
 
-<section class="card">
-    <h2>1. Inline</h2>
-    <pre>Culture.Translate("Welcome").Value
-Culture.Translate("Welcome to {0}", Tenant.Settings.Site.Title)</pre>
-    <p>→ @Culture.Translate("Welcome").Value</p>
-    <p>→ @Culture.Translate("Welcome to {0}", "Zonit").Value</p>
-</section>
+<MudText Class="mb-4">
+    @T("Three idiomatic ways to translate a phrase. All return Translated — a value object with implicit conversion to string, so it composes naturally with HTML output.")
+</MudText>
 
-<section class="card">
-    <h2>2. Try your own phrase</h2>
-    <input class="input" @bind="_input" @bind:event="oninput" />
-    <p>Translated: <strong>@Culture.Translate(_input).Value</strong></p>
-    <p class="muted">Each unmatched key is recorded by the missing-translation tracker.</p>
-</section>
+<MudCard Outlined="true" Class="mb-4">
+    <MudCardContent>
+        <MudText Typo="Typo.h5" GutterBottom="true">@T("1. Inline")</MudText>
+        <pre class="mud-elevation-1 pa-3" style="background:var(--mud-palette-background-grey);border-radius:4px;">@(@"Culture.Translate(""Welcome"").Value
+Culture.Translate(""Welcome to {0}"", Tenant.Settings.Site.Title)")</pre>
+        <MudText>→ <strong>@Culture.Translate("Welcome").Value</strong></MudText>
+        <MudText>→ <strong>@Culture.Translate("Welcome to {0}", "Zonit").Value</strong></MudText>
+    </MudCardContent>
+</MudCard>
 
-<section class="card">
-    <h2>3. DataAnnotations integration</h2>
-    <p>
-        <code>PageEditBase&lt;T&gt;</code> calls <code>Culture.Translate(error)</code> on every
-        validation message. Localising a form is therefore <em>just</em> a matter of providing
-        translations for the static error strings — see <code>/components/page-edit</code>.
-    </p>
-</section>
+<MudCard Outlined="true" Class="mb-4">
+    <MudCardContent>
+        <MudText Typo="Typo.h5" GutterBottom="true">@T("2. Try your own phrase")</MudText>
+        <MudTextField @bind-Value="_input" Immediate="true" Variant="Variant.Outlined"
+                      Label="@T("Phrase to translate")" Class="mb-3" />
+        <MudText>@TM("Translated: <strong>{0}</strong>", Culture.Translate(_input).Value)</MudText>
+        <MudText Typo="Typo.caption" Color="global::MudBlazor.Color.Secondary" Class="mt-2 d-block">
+            @T("Each unmatched key is recorded by the missing-translation tracker.")
+        </MudText>
+    </MudCardContent>
+</MudCard>
 
-@code {
-    string _input = "Hello there";
-}
+<MudCard Outlined="true" Class="mb-4">
+    <MudCardContent>
+        <MudText Typo="Typo.h5" GutterBottom="true">@T("3. DataAnnotations integration")</MudText>
+        <MudText>
+            @T("PageEditBase<T> calls Culture.Translate(error) on every validation message. Localising a form is therefore just a matter of providing translations for the static error strings — see /docs/components/page-edit.")
+        </MudText>
+    </MudCardContent>
+</MudCard>
+
+<MudCard Outlined="true">
+    <MudCardContent>
+        <MudText Typo="Typo.h5" GutterBottom="true">@T("Helpers exposed by PageBase")</MudText>
+        <MudSimpleTable Dense="true" Hover="true" Bordered="true">
+            <thead>
+                <tr><th>@T("Helper")</th><th>@T("Returns")</th><th>@T("Use case")</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>T(key)</code></td><td><code>string</code></td><td>@T("Plain text — most common.")</td></tr>
+                <tr><td><code>T(key, args)</code></td><td><code>string</code></td><td>@T("Composite-format with arguments.")</td></tr>
+                <tr><td><code>TM(key)</code></td><td><code>MarkupString</code></td><td>@T("Translation contains HTML you want rendered.")</td></tr>
+                <tr><td><code>Translate(key)</code></td><td><code>Translation</code></td><td>@T("Full value object — useful when binding to components.")</td></tr>
+            </tbody>
+        </MudSimpleTable>
+    </MudCardContent>
+</MudCard>

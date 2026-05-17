@@ -1,92 +1,84 @@
-@page "/vo/files"
 @rendermode InteractiveServer
+@inherits PageBase
 @using Microsoft.AspNetCore.Components.Forms
+@using MudBlazor
+@using ZColor = Zonit.Extensions.Color
 
-<h1>File-shaped value objects</h1>
+<PageTitle>@T("File-shaped value objects")</PageTitle>
 
-<p>
-    <code>Asset</code> is the headline file VO: pick a file, get an immutable snapshot
-    that already knows its bytes, MIME type (validated against magic bytes — not just
-    the extension), SHA-256, signature, and pretty-printed size. <code>FileSize</code>
-    and <code>Color</code> are tiny helpers reused all over the codebase.
-</p>
+<MudText Typo="Typo.h3" GutterBottom="true">@T("File-shaped value objects")</MudText>
 
-<section class="card">
-    <h2>Asset — drop a file</h2>
-    <InputFile OnChange="OnFile" />
+<MudText Class="mb-4">
+    @T("Asset is the headline file VO: pick a file, get an immutable snapshot that already knows its bytes, MIME type (validated against magic bytes — not just the extension), SHA-256, signature, and pretty-printed size. FileSize and Color are tiny helpers reused all over the codebase.")
+</MudText>
 
-    @if (_asset.HasValue)
-    {
-        <pre>asset.OriginalName  -> @_asset.OriginalName.Value
-asset.UniqueName    -> @_asset.UniqueName
-asset.Extension     -> @_asset.Extension
-asset.MediaType     -> @_asset.MediaType.Value
-asset.Signature     -> @_asset.Signature
-asset.Size          -> @_asset.Size
-asset.Sha256        -> @_asset.Sha256
-asset.CreatedAt     -> @_asset.CreatedAt:O</pre>
+<MudCard Outlined="true" Class="mb-4">
+    <MudCardContent>
+        <MudText Typo="Typo.h5" GutterBottom="true">Asset — @T("drop a file")</MudText>
 
-        @if (_asset.MediaType.Value.StartsWith("image/"))
+        <MudFileUpload T="IBrowserFile" OnFilesChanged="@(async e => await OnFile(e))">
+            <ActivatorContent>
+                <MudButton Variant="Variant.Filled" Color="global::MudBlazor.Color.Primary" StartIcon="@Icons.Material.Filled.CloudUpload">
+                    @T("Pick file")
+                </MudButton>
+            </ActivatorContent>
+        </MudFileUpload>
+
+        @if (_asset.HasValue)
         {
-            <p class="muted">Preview (rendered straight from <code>Asset.DataUrl</code>):</p>
-            <img src="@_asset.DataUrl" alt="@_asset.OriginalName.Value" style="max-width:240px;border:1px solid var(--neutral)" />
+            <pre class="mud-elevation-1 pa-3 mt-3" style="background:var(--mud-palette-background-grey);border-radius:4px;">@($@"asset.OriginalName  -> {_asset.OriginalName.Value}
+asset.UniqueName    -> {_asset.UniqueName}
+asset.Extension     -> {_asset.Extension}
+asset.MediaType     -> {_asset.MediaType.Value}
+asset.Signature     -> {_asset.Signature}
+asset.Size          -> {_asset.Size}
+asset.Sha256        -> {_asset.Sha256}
+asset.CreatedAt     -> {_asset.CreatedAt:O}")</pre>
+
+            @if (_asset.MediaType.Value.StartsWith("image/"))
+            {
+                <MudText Typo="Typo.caption" Color="global::MudBlazor.Color.Secondary" Class="mt-2 d-block">
+                    @T("Preview (rendered straight from Asset.DataUrl):")
+                </MudText>
+                <MudPaper Class="pa-2 mt-2 d-inline-block">
+                    <img src="@_asset.DataUrl" alt="@_asset.OriginalName.Value" style="max-width:240px;display:block;" />
+                </MudPaper>
+            }
         }
-    }
-    else if (_error is not null)
-    {
-        <p class="muted">@_error</p>
-    }
-</section>
-
-<section class="card">
-    <h2>FileSize — pretty-print</h2>
-    <pre>FileSize.OneKilobyte         -> @FileSize.OneKilobyte
-FileSize.OneMegabyte         -> @FileSize.OneMegabyte
-FileSize.OneGigabyte         -> @FileSize.OneGigabyte
-FileSize.HundredMegabytes    -> @FileSize.HundredMegabytes
-new FileSize(15_000_000_000) -> @(new FileSize(15_000_000_000))</pre>
-
-    <p class="muted">Bytes round-trip through <code>FileSize.TryParse("1.5 GB", null, out var f)</code>:</p>
-    @{ FileSize.TryParse(_sizeInput, null, out var parsed); }
-    <input class="input" @bind="_sizeInput" @bind:event="oninput" />
-    <pre>FileSize.TryParse("@_sizeInput") -> @(parsed.Bytes > 0 ? parsed.ToString() : "(invalid)")</pre>
-</section>
-
-<section class="card">
-    <h2>Color — hex, RGB, OKLCH roundtrip</h2>
-    <input type="color" class="input" @bind="_color" @bind:event="oninput" />
-    @{ Color.TryParse(_color, null, out var c); }
-    <pre>Color.TryParse("@_color") ->
-    Hex   = @c.Hex
-    OKLCH = L=@c.L.ToString("0.00") C=@c.C.ToString("0.00") H=@c.H.ToString("0.0")
-    Alpha = @c.Alpha</pre>
-</section>
-
-@code {
-    Asset _asset = Asset.Empty;
-    string? _error;
-    string _sizeInput = "1.5 GB";
-    string _color = "#2563EB";
-
-    async Task OnFile(InputFileChangeEventArgs e)
-    {
-        _error = null;
-        try
+        else if (_error is not null)
         {
-            var file = e.File;
-
-            // Cap at 10 MB so a misclick doesn't try to slurp a multi-gig blob into memory.
-            // The backing Asset.MaxSize is 100 MB — this is a UI-side guard for the demo only.
-            await using var stream = file.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024);
-            using var ms = new MemoryStream();
-            await stream.CopyToAsync(ms);
-
-            _asset = new Asset(ms.ToArray(), file.Name);
+            <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Class="mt-3">@_error</MudAlert>
         }
-        catch (Exception ex)
-        {
-            _asset = Asset.Empty;
-            _error = $"Could not load file: {ex.Message}";
-        }
-    }
-}
+    </MudCardContent>
+</MudCard>
+
+@{ FileSize.TryParse(_sizeInput, null, out var parsed); }
+<MudCard Outlined="true" Class="mb-4">
+    <MudCardContent>
+        <MudText Typo="Typo.h5" GutterBottom="true">FileSize — @T("pretty-print")</MudText>
+        <pre class="mud-elevation-1 pa-3 mb-3" style="background:var(--mud-palette-background-grey);border-radius:4px;">@($@"FileSize.OneKilobyte         -> {FileSize.OneKilobyte}
+FileSize.OneMegabyte         -> {FileSize.OneMegabyte}
+FileSize.OneGigabyte         -> {FileSize.OneGigabyte}
+FileSize.HundredMegabytes    -> {FileSize.HundredMegabytes}
+new FileSize(15_000_000_000) -> {new FileSize(15_000_000_000)}")</pre>
+
+        <MudText Typo="Typo.caption" Color="global::MudBlazor.Color.Secondary" Class="mt-2 d-block">
+            @T("Bytes round-trip through FileSize.TryParse(\"1.5 GB\", null, out var f):")
+        </MudText>
+        <MudTextField @bind-Value="_sizeInput" Immediate="true" Variant="Variant.Outlined" Label="@T("Size")" Class="my-3" />
+        <pre class="mud-elevation-1 pa-3" style="background:var(--mud-palette-background-grey);border-radius:4px;">@($@"FileSize.TryParse(""{_sizeInput}"") -> {(parsed.Bytes > 0 ? parsed.ToString() : "(invalid)")}")</pre>
+    </MudCardContent>
+</MudCard>
+
+@{ ZColor.TryParse(_color, null, out var c); }
+<MudCard Outlined="true">
+    <MudCardContent>
+        <MudText Typo="Typo.h5" GutterBottom="true">Color — hex, RGB, OKLCH @T("roundtrip")</MudText>
+        <MudTextField @bind-Value="_color" Immediate="true" Variant="Variant.Outlined" Label="@T("Hex")" Class="mb-3" />
+        <MudPaper Class="pa-3 mb-3" Style="@($"background:{c.Hex};height:48px;border-radius:4px;")"></MudPaper>
+        <pre class="mud-elevation-1 pa-3" style="background:var(--mud-palette-background-grey);border-radius:4px;">@($@"Color.TryParse(""{_color}"") ->
+    Hex   = {c.Hex}
+    OKLCH = L={c.L:0.00} C={c.C:0.00} H={c.H:0.0}
+    Alpha = {c.Alpha}")</pre>
+    </MudCardContent>
+</MudCard>

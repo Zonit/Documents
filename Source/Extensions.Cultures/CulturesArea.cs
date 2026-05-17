@@ -1,3 +1,4 @@
+using Extensions.Cultures.Pages;
 using Zonit.Extensions.Website;
 
 namespace Documents;
@@ -11,18 +12,18 @@ public sealed class CulturesArea : IWebsiteArea
 {
     public string Key => "cultures";
 
-    public IReadOnlyList<NavGroup> Navigation { get; } = new[]
-    {
+    public IReadOnlyList<NavGroup> Navigation { get; } =
+    [
         new NavGroup
         {
             Title = "Cultures",
             Order = 10,
             Children =
             [
-                new NavItem { Title = "Index",       Url = "/cultures" },
-                new NavItem { Title = "Translation", Url = "/cultures/translation" },
-                new NavItem { Title = "Time zone",   Url = "/cultures/time-zone" },
+                new NavItem { Title = "Index",       Url = CulturesIndex.Route },
+                new NavItem { Title = "Translation", Url = Translation.Route   },
+                new NavItem { Title = "Time zone",   Url = TimeZones.Route     },
             ],
         },
-    };
+    ];
 }

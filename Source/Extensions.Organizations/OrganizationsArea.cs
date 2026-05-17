@@ -1,3 +1,4 @@
+using Extensions.Organizations.Pages;
 using Extensions.Organizations.Stubs;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -15,17 +16,17 @@ public sealed class OrganizationsArea : IWebsiteArea, IWebsiteServices
         services.TryAddScoped<IOrganizationSource, InMemoryUserOrganizationManager>();
     }
 
-    public IReadOnlyList<NavGroup> Navigation { get; } = new[]
-    {
+    public IReadOnlyList<NavGroup> Navigation { get; } =
+    [
         new NavGroup
         {
             Title = "Organizations",
             Order = 30,
             Children =
             [
-                new NavItem { Title = "Workspace", Url = "/organizations" },
-                new NavItem { Title = "Switcher",  Url = "/organizations/switcher" },
+                new NavItem { Title = "Workspace", Url = WorkspaceIndex.Route        },
+                new NavItem { Title = "Switcher",  Url = OrganizationSwitcher.Route },
             ],
         },
-    };
+    ];
 }

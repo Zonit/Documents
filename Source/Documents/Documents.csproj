@@ -24,6 +24,10 @@
     <!-- Core: pulls every domain transitively. -->
     <ProjectReference Include="..\..\..\..\Extensions\Zonit.Extensions\Source\Zonit.Extensions.Website\Zonit.Extensions.Website.csproj" />
 
+    <!-- Public site (root /) + documentation home (/docs). -->
+    <ProjectReference Include="..\Documents.Website\Documents.Website.csproj" />
+    <ProjectReference Include="..\Documents.Docs\Documents.Docs.csproj" />
+
     <!-- Per-domain demo areas. Each is a standalone Razor class library that registers
          its IWebsiteArea, ships its own pages, and demonstrates a slice of Zonit.Extensions.
          A real consumer wires their feature areas the same way. -->

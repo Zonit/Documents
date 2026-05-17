@@ -23,18 +23,21 @@ public static class DemoLoginService
         var username = form["username"].ToString();
         var password = form["password"].ToString();
         var returnUrl = form["returnUrl"].ToString();
-        if (string.IsNullOrWhiteSpace(returnUrl)) returnUrl = "/";
+        // PathBase carries the mount prefix (e.g. "/docs") so login redirects always
+        // resolve under the same Site that hosts the form.
+        var pathBase = httpContext.Request.PathBase.Value ?? string.Empty;
+        if (string.IsNullOrWhiteSpace(returnUrl)) returnUrl = pathBase + "/";
 
         var store = httpContext.RequestServices.GetRequiredService<DemoStore>();
 
         if (!store.Credentials.TryGetValue(username, out var cred) || cred.Password != password)
         {
-            httpContext.Response.Redirect($"/login?error=invalid&returnUrl={Uri.EscapeDataString(returnUrl)}");
+            httpContext.Response.Redirect($"{pathBase}/login?error=invalid&returnUrl={Uri.EscapeDataString(returnUrl)}");
             return;
         }
         if (!store.Users.ContainsKey(cred.UserId))
         {
-            httpContext.Response.Redirect($"/login?error=invalid&returnUrl={Uri.EscapeDataString(returnUrl)}");
+            httpContext.Response.Redirect($"{pathBase}/login?error=invalid&returnUrl={Uri.EscapeDataString(returnUrl)}");
             return;
         }
 
@@ -64,7 +67,8 @@ public static class DemoLoginService
         }
 
         httpContext.Response.Cookies.Delete(AuthExtensions.SessionCookieName);
-        httpContext.Response.Redirect("/");
+        var pathBase = httpContext.Request.PathBase.Value ?? string.Empty;
+        httpContext.Response.Redirect(pathBase + "/");
         return Task.CompletedTask;
     }
 }

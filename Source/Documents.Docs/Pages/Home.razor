@@ -1,0 +1,65 @@
+@rendermode InteractiveServer
+@inherits PageBase
+
+<PageTitle>@T("Zonit documentation")</PageTitle>
+
+<MudText Typo="Typo.h3" GutterBottom="true">@T("Zonit.Extensions reference")</MudText>
+
+<MudText Typo="Typo.body1" Class="mb-6">
+    @T("End-to-end documentation and runnable demos for every package in the Zonit.Extensions family. Pick a topic from the sidebar — every page mixes prose, the live API surface, and a working example you can interact with.")
+</MudText>
+
+<MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mb-6">
+    @T("This site is generated from the same code it documents. Every snippet shown below compiles in the same solution and the live demos are the actual implementations — no parallel sample fork to drift out of sync.")
+</MudAlert>
+
+<MudText Typo="Typo.h5" Class="mt-8 mb-3">@T("Domains")</MudText>
+<MudGrid Spacing="3">
+    @foreach (var card in _cards)
+    {
+        <MudItem xs="12" sm="6" md="4">
+            <MudCard Outlined="true" Class="h-100">
+                <MudCardContent>
+                    <MudText Typo="Typo.h6">
+                        <MudIcon Icon="@card.Icon" Class="mr-2" />@T(card.Title)
+                    </MudText>
+                    <MudText Typo="Typo.body2" Class="mt-2">@T(card.Summary)</MudText>
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton Href="@card.Url" Variant="Variant.Text" Color="global::MudBlazor.Color.Primary">@T("Open")</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+    }
+</MudGrid>
+
+<MudText Typo="Typo.h5" Class="mt-10 mb-3">@T("Conventions used across these pages")</MudText>
+<MudList T="string" Dense="true" DisablePadding="false">
+    <MudListItem T="string" Icon="@Icons.Material.Filled.Code">
+        <MudText Typo="Typo.body2">
+            <strong>@@inherits PageBase</strong> — @T("every demo page derives from PageBase to get Culture / Workspace / Catalog / Authenticated / Toast / Cookie / BreadcrumbsProvider as protected properties from ExtensionsBase. No per-page @@inject lines for these.")
+        </MudText>
+    </MudListItem>
+    <MudListItem T="string" Icon="@Icons.Material.Filled.Translate">
+        <MudText Typo="Typo.body2">
+            @TM("{0} or {1} — all user-facing strings flow through the culture provider. {2} returns a string, {3} returns a {4}, {5} returns the {6} value object.",
+                "<strong>@T(\"...\")</strong>",
+                "<strong>@Translate(\"...\")</strong>",
+                "<code>T</code>",
+                "<code>TM</code>",
+                "<code>MarkupString</code>",
+                "<code>Translate</code>",
+                "<code>Translation</code>")
+        </MudText>
+    </MudListItem>
+    <MudListItem T="string" Icon="@Icons.Material.Filled.ViewModule">
+        <MudText Typo="Typo.body2">
+            <strong>PageViewBase&lt;T&gt;</strong> / <strong>PageEditBase&lt;T&gt;</strong> — @T("read-only and editing flavours of PageBase with persistent state, loading flag, validation and auto-save out of the box.")
+        </MudText>
+    </MudListItem>
+    <MudListItem T="string" Icon="@Icons.Material.Filled.Link">
+        <MudText Typo="Typo.body2">
+            <strong>[Route(Route)]</strong> — @T("every page declares its URL as a public const so navigation entries and inter-page links reference the same string. Rename a route in one place and the sidebar follows.")
+        </MudText>
+    </MudListItem>
+</MudList>

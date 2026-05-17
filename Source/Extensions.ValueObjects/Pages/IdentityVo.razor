@@ -1,55 +1,61 @@
-@page "/vo/identity"
-@inject IAuthenticatedProvider Auth
+@rendermode InteractiveServer
+@inherits PageBase
+@using MudBlazor
 
-<h1>Identity / Role / Permission</h1>
+<PageTitle>Identity / Role / Permission</PageTitle>
 
-<p>
-    The <code>Identity</code> VO carries Id + Name + Roles + Permissions. Roles and
-    permissions are tiny VOs validated on construction; permissions support wildcards via
-    <code>Permission.Implies</code>.
-</p>
+<MudText Typo="Typo.h3" GutterBottom="true">Identity / Role / Permission</MudText>
 
-<section class="card">
-    <h2>Construction</h2>
-    <pre>// Id-only — typical for foreign-key columns
+<MudText Class="mb-4">
+    @T("The Identity VO carries Id + Name + Roles + Permissions. Roles and permissions are tiny VOs validated on construction; permissions support wildcards via Permission.Implies.")
+</MudText>
+
+<MudCard Outlined="true" Class="mb-4">
+    <MudCardContent>
+        <MudText Typo="Typo.h5" GutterBottom="true">@T("Construction")</MudText>
+        <pre class="mud-elevation-1 pa-3" style="background:var(--mud-palette-background-grey);border-radius:4px;">@(@"// Id-only — typical for foreign-key columns
 Identity id = Guid.NewGuid();          // implicit
 
 // Full snapshot
 var hydrated = new Identity(
     Guid.NewGuid(),
-    "Linus Pauling",
-    roles:       new[] { Role.Create("admin") },
-    permissions: new[] { Permission.Create("orders.*") });</pre>
-</section>
+    ""Linus Pauling"",
+    roles:       new[] { Role.Create(""admin"") },
+    permissions: new[] { Permission.Create(""orders.*"") });")</pre>
+    </MudCardContent>
+</MudCard>
 
-<section class="card">
-    <h2>Wildcards: <code>Permission.Implies</code></h2>
-    <p>
-        Tokens are dot-separated; <code>*</code> matches everything below a segment.
-        <code>Implies(other)</code> returns <em>true</em> when the holder satisfies <em>other</em>.
-    </p>
-    @{
-        Permission.TryCreate("orders.*", out var granted);
-        Permission.TryCreate("orders.read", out var requested);
-        Permission.TryCreate("invoices.read", out var unrelated);
-    }
-    <pre>granted = "orders.*"
-granted.Implies("orders.read")   -> @granted.Implies(requested)
-granted.Implies("invoices.read") -> @granted.Implies(unrelated)</pre>
-</section>
+@{
+    Permission.TryCreate("orders.*", out var granted);
+    Permission.TryCreate("orders.read", out var requested);
+    Permission.TryCreate("invoices.read", out var unrelated);
+}
+<MudCard Outlined="true" Class="mb-4">
+    <MudCardContent>
+        <MudText Typo="Typo.h5" GutterBottom="true">@T("Wildcards: Permission.Implies")</MudText>
+        <MudText Class="mb-2">
+            @T("Tokens are dot-separated; * matches everything below a segment. Implies(other) returns true when the holder satisfies other.")
+        </MudText>
+        <pre class="mud-elevation-1 pa-3" style="background:var(--mud-palette-background-grey);border-radius:4px;">@($@"granted = ""orders.*""
+granted.Implies(""orders.read"")   -> {granted.Implies(requested)}
+granted.Implies(""invoices.read"") -> {granted.Implies(unrelated)}")</pre>
+    </MudCardContent>
+</MudCard>
 
-<section class="card">
-    <h2>Current identity</h2>
-    @if (!Auth.Current.HasValue)
-    {
-        <p class="muted">Anonymous — log in to populate.</p>
-    }
-    else
-    {
-        <pre>Auth.Current.Id                 -> @Auth.Current.Id
-Auth.Current.Name.Value         -> @Auth.Current.Name.Value
-Auth.Current.IsInRole("admin")  -> @Auth.Current.IsInRole(Role.TryCreate("admin", out var r) ? r : Role.Empty)
-Auth.Current.HasPermission("orders.read")
-                                -> @Auth.Current.HasPermission(Permission.TryCreate("orders.read", out var p) ? p : Permission.Empty)</pre>
-    }
-</section>
+<MudCard Outlined="true">
+    <MudCardContent>
+        <MudText Typo="Typo.h5" GutterBottom="true">@T("Current identity")</MudText>
+        @if (!Authenticated.Current.HasValue)
+        {
+            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">@T("Anonymous — log in to populate.")</MudAlert>
+        }
+        else
+        {
+            <pre class="mud-elevation-1 pa-3" style="background:var(--mud-palette-background-grey);border-radius:4px;">@($@"Authenticated.Current.Id                 -> {Authenticated.Current.Id}
+Authenticated.Current.Name.Value         -> {Authenticated.Current.Name.Value}
+Authenticated.Current.IsInRole(""admin"")  -> {Authenticated.Current.IsInRole(Role.TryCreate("admin", out var r) ? r : Role.Empty)}
+Authenticated.Current.HasPermission(""orders.read"")
+                                          -> {Authenticated.Current.HasPermission(Permission.TryCreate("orders.read", out var p) ? p : Permission.Empty)}")</pre>
+        }
+    </MudCardContent>
+</MudCard>

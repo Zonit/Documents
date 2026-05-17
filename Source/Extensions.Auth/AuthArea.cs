@@ -1,3 +1,4 @@
+using Extensions.Auth.Pages;
 using Extensions.Auth.Stubs;
 using Extensions.Shared;
 using Microsoft.AspNetCore.Builder;
@@ -50,9 +51,9 @@ public sealed class AuthArea : IWebsiteArea, IWebsiteServices
             Order = 20,
             Children =
             [
-                new NavItem { Title = "Identity",         Url = "/auth" },
-                new NavItem { Title = "AuthorizeView",    Url = "/auth/authorize-view" },
-                new NavItem { Title = "[RequirePermission]", Url = "/auth/require-permission" },
+                new NavItem { Title = "Identity",            Url = AuthIndex.Route             },
+                new NavItem { Title = "AuthorizeView",       Url = AuthorizeViewDemo.Route     },
+                new NavItem { Title = "[RequirePermission]", Url = RequirePermissionDemo.Route },
             ],
         },
     };

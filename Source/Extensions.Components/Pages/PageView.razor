@@ -1,56 +1,52 @@
-@page "/components/page-view"
-@using Extensions.Components.Models
 @rendermode InteractiveServer
-@inherits PageViewBase<TaskViewModel>
+@inherits PageViewBase<Extensions.Components.Models.TaskViewModel>
+@using Extensions.Components.Models
 
-<h1>PageViewBase&lt;T&gt;</h1>
+<PageTitle>PageViewBase&lt;T&gt;</PageTitle>
 
-<p>
-    <code>PageViewBase&lt;T&gt;</code> is a thin wrapper for read-only pages. It owns the
-    <code>Model</code>, supplies a <code>LoadAsync</code> hook, exposes <code>IsLoading</code>,
-    and (by default) persists the model into <code>PersistentComponentState</code> so the
-    transition <em>SSR → InteractiveServer</em> happens without a second load.
-</p>
+<MudText Typo="Typo.h3" GutterBottom="true">PageViewBase&lt;T&gt;</MudText>
+
+<MudText Class="mb-4">
+    @T("PageViewBase<T> is a thin wrapper for read-only pages. It owns the Model, supplies a LoadAsync hook, exposes IsLoading, and (by default) persists the model into PersistentComponentState so the transition SSR → InteractiveServer happens without a second load.")
+</MudText>
 
 @if (IsLoading || Model is null)
 {
-    <p class="muted">Loading…</p>
+    <MudProgressCircular Color="global::MudBlazor.Color.Primary" Indeterminate="true" />
+    <MudText Class="ml-3 d-inline">@T("Loading…")</MudText>
 }
 else
 {
-    <section class="card">
-        <h2>@Model.Title</h2>
-        <dl>
-            <dt>Priority</dt>  <dd>@Model.Priority</dd>
-            <dt>Due</dt>       <dd>@Model.DueDate</dd>
-            <dt>Completed</dt> <dd>@Model.Completed</dd>
-        </dl>
-        <p>@Model.Notes</p>
-    </section>
-
-    <section class="card">
-        <button class="btn-primary" @onclick="Reload">Reload</button>
-    </section>
+    <MudCard Outlined="true" Class="mb-4">
+        <MudCardContent>
+            <MudText Typo="Typo.h5" GutterBottom="true">@Model.Title</MudText>
+            <MudSimpleTable Dense="true" Bordered="true">
+                <tbody>
+                    <tr><td><strong>@T("Priority")</strong></td><td>@Model.Priority</td></tr>
+                    <tr><td><strong>@T("Due")</strong></td><td>@Model.DueDate</td></tr>
+                    <tr><td><strong>@T("Completed")</strong></td><td>@Model.Completed</td></tr>
+                </tbody>
+            </MudSimpleTable>
+            <MudText Class="mt-3">@Model.Notes</MudText>
+        </MudCardContent>
+        <MudCardActions>
+            <MudButton Variant="Variant.Filled" Color="global::MudBlazor.Color.Primary"
+                       StartIcon="@Icons.Material.Filled.Refresh" OnClick="Reload">
+                @T("Reload")
+            </MudButton>
+        </MudCardActions>
+    </MudCard>
 }
 
-<section class="card">
-    <h2>How it works</h2>
-    <pre>@@inherits PageViewBase&lt;TaskViewModel&gt;
+<MudCard Outlined="true">
+    <MudCardContent>
+        <MudText Typo="Typo.h5" GutterBottom="true">@T("How it works")</MudText>
+        <pre class="mud-elevation-1 pa-3" style="background:var(--mud-palette-background-grey);border-radius:4px;">@(@"@inherits PageViewBase<TaskViewModel>
 
-protected override async Task&lt;TaskViewModel?&gt; LoadAsync(CancellationToken ct)
+protected override async Task<TaskViewModel?> LoadAsync(CancellationToken ct)
 {
     // your data layer call
     return await _store.GetCurrentTaskAsync(ct);
-}</pre>
-</section>
-
-@code {
-    // Simulate I/O delay to make IsLoading observable.
-    protected override async Task<TaskViewModel?> LoadAsync(CancellationToken cancellationToken)
-    {
-        await Task.Delay(250, cancellationToken);
-        return new TaskViewModel();
-    }
-
-    Task Reload() => RefreshAsync();
-}
+}")</pre>
+    </MudCardContent>
+</MudCard>

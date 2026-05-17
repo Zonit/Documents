@@ -1,28 +1,30 @@
-@page "/projects"
 @rendermode InteractiveServer
 @inherits PageBase
 
-<h1>Catalog</h1>
+<PageTitle>@T("Catalog")</PageTitle>
 
-<p>
-    <code>ICatalogProvider</code> exposes the current project as a <code>Project</code>
-    value object. Hydrated by <code>ProjectMiddleware</code> from
-    <code>IProjectSource</code>; scoped to the active organization, so an
-    org switch invalidates the project automatically.
-</p>
+<MudText Typo="Typo.h3" GutterBottom="true">@T("Catalog")</MudText>
+
+<MudText Class="mb-4">
+    @T("ICatalogProvider exposes the current project as a Project value object. Hydrated by ProjectMiddleware from IProjectSource; scoped to the active organization, so an org switch invalidates the project automatically.")
+</MudText>
 
 @if (!Catalog.Project.HasValue)
 {
-    <div class="alert">No project selected.</div>
+    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">@T("No project selected.")</MudAlert>
 }
 else
 {
-    <section class="card">
-        <h2>Current</h2>
-        <dl>
-            <dt>Id</dt>   <dd><code>@Catalog.Project.Id</code></dd>
-            <dt>Name</dt> <dd>@Catalog.Project.Name.Value</dd>
-            <dt>Slug</dt> <dd>@Catalog.Project.Slug.Value</dd>
-        </dl>
-    </section>
+    <MudCard Outlined="true">
+        <MudCardContent>
+            <MudText Typo="Typo.h5" GutterBottom="true">@T("Current")</MudText>
+            <MudSimpleTable Dense="true" Bordered="true">
+                <tbody>
+                    <tr><td><strong>Id</strong></td><td><code>@Catalog.Project.Id</code></td></tr>
+                    <tr><td><strong>@T("Name")</strong></td><td>@Catalog.Project.Name.Value</td></tr>
+                    <tr><td><strong>@T("Slug")</strong></td><td>@Catalog.Project.Slug.Value</td></tr>
+                </tbody>
+            </MudSimpleTable>
+        </MudCardContent>
+    </MudCard>
 }

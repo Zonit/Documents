@@ -1,68 +1,67 @@
-@page "/vo/numbers"
 @rendermode InteractiveServer
+@inherits PageBase
+@using MudBlazor
+@using ZColor = Zonit.Extensions.Color
 
-<h1>Numeric value objects</h1>
+<PageTitle>@T("Numeric value objects")</PageTitle>
 
-<section class="card">
-    <h2>Money / Price — locale-flexible parsing</h2>
-    <p>
-        Both <code>,</code> and <code>.</code> decimal separators are accepted, mixed
-        thousand separators are tolerated. Known ambiguity: <code>"1,234"</code> parses as
-        <em>"one and 234"</em> (decimal-first heuristic). Document this in your UI.
-    </p>
+<MudText Typo="Typo.h3" GutterBottom="true">@T("Numeric value objects")</MudText>
 
-    <input class="input" @bind="_input" @bind:event="oninput" placeholder="1.234,56" />
-    <pre>Money.TryParse("@_input", null, out m) -> @(_money.HasValue ? _money.Value.ToString() : "(invalid)")
-Price.TryParse("@_input", null, out p) -> @(_price.HasValue ? _price.Value.ToString() : "(invalid)")</pre>
-</section>
+<MudCard Outlined="true" Class="mb-4">
+    <MudCardContent>
+        <MudText Typo="Typo.h5" GutterBottom="true">@T("Money / Price — locale-flexible parsing")</MudText>
+        <MudText Class="mb-2">
+            @T("Both , and . decimal separators are accepted, mixed thousand separators are tolerated. Known ambiguity: \"1,234\" parses as \"one and 234\" (decimal-first heuristic). Document this in your UI.")
+        </MudText>
+        <MudTextField @bind-Value="_input" Immediate="true" Variant="Variant.Outlined" Label="@T("Amount")" Placeholder="1.234,56" Class="mb-3" />
+        <pre class="mud-elevation-1 pa-3" style="background:var(--mud-palette-background-grey);border-radius:4px;">@($@"Money.TryParse(""{_input}"", null, out m) -> {(_money.HasValue ? _money.Value.ToString() : "(invalid)")}
+Price.TryParse(""{_input}"", null, out p) -> {(_price.HasValue ? _price.Value.ToString() : "(invalid)")}")</pre>
+    </MudCardContent>
+</MudCard>
 
-<section class="card">
-    <h2>FileSize — pretty-print</h2>
-    <pre>new FileSize(123).ToString()         -> @(new FileSize(123).ToString())
-new FileSize(1500).ToString()        -> @(new FileSize(1500).ToString())
-new FileSize(1_500_000).ToString()   -> @(new FileSize(1_500_000).ToString())
-new FileSize(15_000_000_000).ToString() -> @(new FileSize(15_000_000_000).ToString())</pre>
-</section>
+<MudCard Outlined="true" Class="mb-4">
+    <MudCardContent>
+        <MudText Typo="Typo.h5" GutterBottom="true">FileSize — @T("pretty-print")</MudText>
+        <pre class="mud-elevation-1 pa-3" style="background:var(--mud-palette-background-grey);border-radius:4px;">@($@"new FileSize(123).ToString()            -> {new FileSize(123)}
+new FileSize(1500).ToString()           -> {new FileSize(1500)}
+new FileSize(1_500_000).ToString()      -> {new FileSize(1_500_000)}
+new FileSize(15_000_000_000).ToString() -> {new FileSize(15_000_000_000)}")</pre>
+    </MudCardContent>
+</MudCard>
 
-<section class="card">
-    <h2>Currency — ISO 4217 + crypto</h2>
-    <p>
-        ~30 fiat predefined as static fields (<code>Currency.USD</code>,
-        <code>Currency.EUR</code>, <code>Currency.PLN</code>, …) plus crypto
-        (<code>Currency.BTC</code>, <code>Currency.ETH</code>, …). Unknown but
-        well-formed codes parse too — just without metadata.
-    </p>
-    @{
-        var pln = Currency.PLN;
-        var btc = Currency.BTC;
-        var jpy = Currency.JPY;
-        Currency.TryParse(_currencyInput.ToUpperInvariant(), null, out var picked);
-    }
-    <pre>Currency.PLN -> code=@pln.Code symbol=@pln.Symbol name="@pln.Name" digits=@pln.DecimalDigits crypto=@pln.IsCrypto
-Currency.BTC -> code=@btc.Code symbol=@btc.Symbol name="@btc.Name" digits=@btc.DecimalDigits crypto=@btc.IsCrypto
-Currency.JPY -> code=@jpy.Code symbol=@jpy.Symbol name="@jpy.Name" digits=@jpy.DecimalDigits crypto=@jpy.IsCrypto</pre>
-
-    <input class="input" @bind="_currencyInput" @bind:event="oninput" placeholder="USD / EUR / BTC / DOGE / FOO" />
-    <pre>Currency.TryParse("@_currencyInput.ToUpperInvariant()") ->
-    Code   = @picked.Code
-    Symbol = "@picked.Symbol"
-    Name   = "@picked.Name"</pre>
-</section>
-
-<section class="card">
-    <h2>Color — hex roundtrip</h2>
-    @{ Color.TryParse(_color, null, out var c); }
-    <input class="input" @bind="_color" @bind:event="oninput" />
-    <pre>Color.TryParse("@_color", out var c) -> @c.Hex
-                                  RGB hex -> @c.Hex
-                                  OKLCH   -> L=@c.L.ToString("0.00") C=@c.C.ToString("0.00") H=@c.H.ToString("0.0")</pre>
-</section>
-
-@code {
-    string _input          = "1.234,56";
-    string _color          = "#2563EB";
-    string _currencyInput  = "USD";
-
-    Money? _money => Money.TryParse(_input, null, out var v) ? v : null;
-    Price? _price => Price.TryParse(_input, null, out var v) ? v : null;
+@{
+    var pln = Currency.PLN;
+    var btc = Currency.BTC;
+    var jpy = Currency.JPY;
+    Currency.TryParse(_currencyInput.ToUpperInvariant(), null, out var picked);
 }
+<MudCard Outlined="true" Class="mb-4">
+    <MudCardContent>
+        <MudText Typo="Typo.h5" GutterBottom="true">Currency — ISO 4217 + crypto</MudText>
+        <MudText Class="mb-2">
+            @T("~30 fiat predefined as static fields (Currency.USD, Currency.EUR, Currency.PLN, …) plus crypto (Currency.BTC, Currency.ETH, …). Unknown but well-formed codes parse too — just without metadata.")
+        </MudText>
+        <pre class="mud-elevation-1 pa-3 mb-3" style="background:var(--mud-palette-background-grey);border-radius:4px;">@($@"Currency.PLN -> code={pln.Code} symbol={pln.Symbol} name=""{pln.Name}"" digits={pln.DecimalDigits} crypto={pln.IsCrypto}
+Currency.BTC -> code={btc.Code} symbol={btc.Symbol} name=""{btc.Name}"" digits={btc.DecimalDigits} crypto={btc.IsCrypto}
+Currency.JPY -> code={jpy.Code} symbol={jpy.Symbol} name=""{jpy.Name}"" digits={jpy.DecimalDigits} crypto={jpy.IsCrypto}")</pre>
+
+        <MudTextField @bind-Value="_currencyInput" Immediate="true" Variant="Variant.Outlined"
+                      Label="@T("Code")" Placeholder="USD / EUR / BTC / DOGE / FOO" Class="mb-3" />
+        <pre class="mud-elevation-1 pa-3" style="background:var(--mud-palette-background-grey);border-radius:4px;">@($@"Currency.TryParse(""{_currencyInput.ToUpperInvariant()}"") ->
+    Code   = {picked.Code}
+    Symbol = ""{picked.Symbol}""
+    Name   = ""{picked.Name}""")</pre>
+    </MudCardContent>
+</MudCard>
+
+@{ ZColor.TryParse(_color, null, out var c); }
+<MudCard Outlined="true">
+    <MudCardContent>
+        <MudText Typo="Typo.h5" GutterBottom="true">Color — hex roundtrip</MudText>
+        <MudTextField @bind-Value="_color" Immediate="true" Variant="Variant.Outlined" Label="@T("Hex")" Class="mb-3" />
+        <MudPaper Class="pa-3 mb-3" Style="@($"background:{c.Hex};height:48px;border-radius:4px;")"></MudPaper>
+        <pre class="mud-elevation-1 pa-3" style="background:var(--mud-palette-background-grey);border-radius:4px;">@($@"Color.TryParse(""{_color}"", out var c) -> {c.Hex}
+                                  RGB hex -> {c.Hex}
+                                  OKLCH   -> L={c.L:0.00} C={c.C:0.00} H={c.H:0.0}")</pre>
+    </MudCardContent>
+</MudCard>

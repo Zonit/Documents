@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\Extensions\Zonit.Extensions\Source\Zonit.Extensions.Website\Zonit.Extensions.Website.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Mounted under Zonit.Dashboard (/docs), which already configures MudBlazor
+         globally. We still reference the package so razor markup compiles. -->
+    <PackageReference Include="MudBlazor" Version="9.4.0" />
+  </ItemGroup>
+</Project>

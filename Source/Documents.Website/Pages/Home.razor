@@ -1,0 +1,69 @@
+@rendermode InteractiveServer
+@inherits PageBase
+
+@*
+    Public landing page. Scoped MudBlazor assets + providers are declared inline so
+    the root mount stays free of global MudBlazor wiring — the heavy lifting (theme +
+    Mud DI) lives under the /docs (dashboard) mount.
+*@
+<HeadContent>
+    <link rel="stylesheet" href="_content/MudBlazor/MudBlazor.min.css" />
+    <script src="_content/MudBlazor/MudBlazor.min.js"></script>
+</HeadContent>
+
+<MudThemeProvider />
+<MudPopoverProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="py-12">
+    <MudStack Spacing="6" AlignItems="AlignItems.Center">
+
+        <MudText Typo="Typo.h2" Align="Align.Center">Zonit.Extensions</MudText>
+
+        <MudText Typo="Typo.h5" Align="Align.Center" Color="global::MudBlazor.Color.Secondary">
+            @T("Opinionated building blocks for Blazor apps")
+        </MudText>
+
+        <MudText Typo="Typo.body1" Align="Align.Center" Class="px-4">
+            @T("Cultures, Auth, Organizations, Projects, Tenants, Components, ValueObjects — all designed to compose into a single, AOT-friendly Blazor host.")
+        </MudText>
+
+        <MudStack Row="true" Spacing="3" Class="mt-4">
+            <MudButton Href="/docs"
+                       Variant="Variant.Filled"
+                       Color="global::MudBlazor.Color.Primary"
+                       Size="Size.Large"
+                       StartIcon="@Icons.Material.Filled.MenuBook">
+                @T("Read the docs")
+            </MudButton>
+
+            <MudButton Href="https://github.com/zonit"
+                       Variant="Variant.Outlined"
+                       Color="global::MudBlazor.Color.Default"
+                       Size="Size.Large"
+                       Target="_blank"
+                       StartIcon="@Icons.Custom.Brands.GitHub">
+                @T("Source on GitHub")
+            </MudButton>
+        </MudStack>
+
+        <MudDivider Class="my-8" />
+
+        <MudGrid Spacing="3">
+            @foreach (var feature in _features)
+            {
+                <MudItem xs="12" sm="6" md="4">
+                    <MudPaper Class="pa-4 h-100" Elevation="1">
+                        <MudText Typo="Typo.h6">@T(feature.Title)</MudText>
+                        <MudText Typo="Typo.body2" Class="mt-2">@T(feature.Summary)</MudText>
+                    </MudPaper>
+                </MudItem>
+            }
+        </MudGrid>
+
+        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mt-8 w-100">
+            @TM("This landing page is intentionally minimal. The interactive reference and full API documentation live at {0}.", "<a href=\"/docs\">/docs</a>")
+        </MudAlert>
+    </MudStack>
+</MudContainer>

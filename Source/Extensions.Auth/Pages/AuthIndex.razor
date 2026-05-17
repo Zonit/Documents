@@ -1,49 +1,61 @@
-@page "/auth"
 @rendermode InteractiveServer
 @inherits PageBase
 
-<h1>Identity</h1>
+<PageTitle>@T("Identity")</PageTitle>
 
-<p>
-    <code>IAuthenticatedProvider.Current</code> returns the lightweight
-    <code>Identity</code> value object — Id, Name, Roles, Permissions — hydrated by
-    <code>SessionMiddleware</code> from the auth cookie. <strong>No second DB call per request.</strong>
-</p>
+<MudText Typo="Typo.h3" GutterBottom="true">@T("Identity")</MudText>
+
+<MudText Class="mb-4">
+    @TM("{0} returns the lightweight {1} value object — Id, Name, Roles, Permissions — hydrated by {2} from the auth cookie. {3}",
+        "<code>IAuthenticatedProvider.Current</code>",
+        "<code>Identity</code>",
+        "<code>SessionMiddleware</code>",
+        "<strong>No second DB call per request.</strong>")
+</MudText>
 
 @if (!Authenticated.Current.HasValue)
 {
-    <div class="alert">You are anonymous. <a href="/login">Log in</a> to populate this page.</div>
+    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mb-4">
+        @TM("You are anonymous. {0} to populate this page.",
+            $"<a href=\"login\">{T("Log in")}</a>")
+    </MudAlert>
 }
 else
 {
     var id = Authenticated.Current;
-    <section class="card">
-        <h2>Current</h2>
-        <dl>
-            <dt>Id</dt>          <dd><code>@id.Id</code></dd>
-            <dt>Name</dt>        <dd>@id.Name.Value</dd>
-            <dt>Has snapshot</dt><dd>@id.HasSnapshot</dd>
-            <dt>Roles</dt>       <dd>@string.Join(", ", id.Roles.Select(r => r.Value))</dd>
-            <dt>Permissions</dt> <dd>@string.Join(", ", id.Permissions.Select(p => p.Value))</dd>
-        </dl>
-    </section>
+    <MudCard Outlined="true" Class="mb-4">
+        <MudCardContent>
+            <MudText Typo="Typo.h5" GutterBottom="true">@T("Current")</MudText>
+            <MudSimpleTable Dense="true" Bordered="true">
+                <tbody>
+                    <tr><td><strong>Id</strong></td><td><code>@id.Id</code></td></tr>
+                    <tr><td><strong>@T("Name")</strong></td><td>@id.Name.Value</td></tr>
+                    <tr><td><strong>@T("Has snapshot")</strong></td><td>@id.HasSnapshot</td></tr>
+                    <tr><td><strong>@T("Roles")</strong></td><td>@string.Join(", ", id.Roles.Select(r => r.Value))</td></tr>
+                    <tr><td><strong>@T("Permissions")</strong></td><td>@string.Join(", ", id.Permissions.Select(p => p.Value))</td></tr>
+                </tbody>
+            </MudSimpleTable>
+        </MudCardContent>
+    </MudCard>
 
-    <section class="card">
-        <h2>Behavioural checks</h2>
-        <pre>id.IsInRole("admin")              -> @id.IsInRole(Role.TryCreate("admin", out var r1) ? r1 : Role.Empty)
-id.HasPermission("users.read")    -> @id.HasPermission(Permission.TryCreate("users.read", out var p1) ? p1 : Permission.Empty)
-id.HasPermission("settings.write") -> @id.HasPermission(Permission.TryCreate("settings.write", out var p2) ? p2 : Permission.Empty)</pre>
-        <p class="muted">
-            Wildcards are honoured: <code>*</code> on the admin user satisfies any concrete
-            permission via <code>Permission.Implies</code>.
-        </p>
-    </section>
+    <MudCard Outlined="true" Class="mb-4">
+        <MudCardContent>
+            <MudText Typo="Typo.h5" GutterBottom="true">@T("Behavioural checks")</MudText>
+            <pre class="mud-elevation-1 pa-3" style="background:var(--mud-palette-background-grey);border-radius:4px;">@($@"id.IsInRole(""admin"")              -> {id.IsInRole(Role.TryCreate("admin", out var r1) ? r1 : Role.Empty)}
+id.HasPermission(""users.read"")    -> {id.HasPermission(Permission.TryCreate("users.read", out var p1) ? p1 : Permission.Empty)}
+id.HasPermission(""settings.write"") -> {id.HasPermission(Permission.TryCreate("settings.write", out var p2) ? p2 : Permission.Empty)}")</pre>
+            <MudText Typo="Typo.body2" Color="global::MudBlazor.Color.Secondary" Class="mt-2">
+                @T("Wildcards are honoured: '*' on the admin user satisfies any concrete permission via Permission.Implies.")
+            </MudText>
+        </MudCardContent>
+    </MudCard>
 }
 
-<section class="card">
-    <h2>Cascading <code>AuthenticationState</code></h2>
-    <p>The same identity is also exposed through Blazor's
-       <code>CascadingAuthenticationState</code>, populated by
-       <code>SessionAuthenticationService</code>. That's what makes
-       <code>&lt;AuthorizeView&gt;</code> work without further plumbing — see the next page.</p>
-</section>
+<MudCard Outlined="true">
+    <MudCardContent>
+        <MudText Typo="Typo.h5" GutterBottom="true">@T("Cascading AuthenticationState")</MudText>
+        <MudText>
+            @T("The same identity is also exposed through Blazor's CascadingAuthenticationState, populated by SessionAuthenticationService. That is what makes <AuthorizeView> work without further plumbing — see the next page.")
+        </MudText>
+    </MudCardContent>
+</MudCard>

@@ -1,104 +1,68 @@
-@page "/components/auto-save"
-@using Extensions.Components.Models
 @rendermode InteractiveServer
-@inherits PageEditBase<TaskViewModel>
+@inherits PageEditBase<Extensions.Components.Models.TaskViewModel>
+@using Extensions.Components.Models
 
-<h1>[AutoSave] per-field saving</h1>
+<PageTitle>@T("[AutoSave] per-field saving")</PageTitle>
 
-<p>
-    Properties decorated with <code>[AutoSave]</code> (optionally <code>[AutoSave(DelayMs=…)]</code>)
-    trigger <code>AutoSaveAsync(fieldName, oldValue, newValue, ct)</code> after a debounce
-    interval. The override below pushes a toast — a real app would <code>PATCH</code> the
-    field to its backend.
-</p>
+<MudText Typo="Typo.h3" GutterBottom="true">@T("[AutoSave] per-field saving")</MudText>
 
-<EditForm EditContext="@EditContext" OnValidSubmit="HandleValidSubmit" FormName="autosave">
-    <DataAnnotationsValidator />
+<MudText Class="mb-4">
+    @T("Properties decorated with [AutoSave] (optionally [AutoSave(DelayMs=…)]) trigger AutoSaveAsync(fieldName, oldValue, newValue, ct) after a debounce interval. The override below pushes a toast — a real app would PATCH the field to its backend.")
+</MudText>
 
-    @*
-        Default <InputText> / <InputTextArea> notify EditContext on `onchange` (blur),
-        so the AutoSave debounce only starts once the user leaves the field. For a
-        true "save while typing" experience the inputs must notify on EVERY keystroke.
-        We bypass InputBase here and wire `oninput` -> Model + EditContext.NotifyFieldChanged
-        manually. The framework's HandleFieldAutoSave then ticks its 1500 ms timer on
-        every change and we land at the desired UX without changing PageEditBase.
-    *@
-    <section class="card stack">
-        <label>
-            Title <small class="muted">(no auto-save)</small>
-            <input value="@Model.Title"
-                   @oninput="e => OnFieldInput(nameof(Model.Title), e.Value?.ToString())" />
-        </label>
+<MudCard Outlined="true" Class="mb-4">
+    <MudCardContent>
+        <EditForm EditContext="@EditContext" OnValidSubmit="HandleValidSubmit" FormName="autosave">
+            <DataAnnotationsValidator />
 
-        <label>
-            Notes <small class="muted">[AutoSave(1500ms)]</small>
-            <textarea rows="3"
-                      value="@Model.Notes"
-                      @oninput="e => OnFieldInput(nameof(Model.Notes), e.Value?.ToString())"></textarea>
-        </label>
+            @* Default InputText / InputTextArea notify EditContext on `onchange` (blur),
+               so the AutoSave debounce only starts after the user leaves the field. For a
+               true "save while typing" experience the inputs must notify on EVERY keystroke.
+               We bypass InputBase here and wire `oninput` -> Model + NotifyFieldChanged. *@
+            <MudStack Spacing="3">
+                <MudTextField T="string" Value="@Model.Title"
+                              ValueChanged="@(v => OnFieldInput(nameof(Model.Title), v))"
+                              Immediate="true" Variant="Variant.Outlined"
+                              Label="@T("Title")" HelperText="@T("(no auto-save)")" />
 
-        <label>
-            Priority <small class="muted">[AutoSave]</small>
-            <input type="number"
-                   value="@Model.Priority"
-                   @oninput="e => OnPriorityInput(e.Value?.ToString())" />
-        </label>
+                <MudTextField T="string" Value="@Model.Notes"
+                              ValueChanged="@(v => OnFieldInput(nameof(Model.Notes), v))"
+                              Immediate="true" Variant="Variant.Outlined"
+                              Lines="3" Label="@T("Notes")" HelperText="[AutoSave(1500ms)]" />
 
-        <button type="submit" class="btn-primary">Submit anyway</button>
-    </section>
-</EditForm>
+                <MudTextField T="string" Value="@Model.Priority.ToString()"
+                              ValueChanged="@(v => OnPriorityInput(v))"
+                              Immediate="true" Variant="Variant.Outlined"
+                              Label="@T("Priority")" HelperText="[AutoSave]" />
 
-<section class="card">
-    <h2>Auto-save log</h2>
-    @if (_log.Count == 0)
-    {
-        <p class="muted">Edit "Notes" or "Priority" and pause typing — entries appear here.</p>
-    }
-    else
-    {
-        <ul class="log">
-            @foreach (var entry in _log)
-            {
-                <li><code>@entry</code></li>
-            }
-        </ul>
-    }
-</section>
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled"
+                           Color="global::MudBlazor.Color.Primary" StartIcon="@Icons.Material.Filled.Send">
+                    @T("Submit anyway")
+                </MudButton>
+            </MudStack>
+        </EditForm>
+    </MudCardContent>
+</MudCard>
 
-@code {
-    private readonly List<string> _log = [];
-
-    void OnFieldInput(string fieldName, string? value)
-    {
-        switch (fieldName)
+<MudCard Outlined="true">
+    <MudCardContent>
+        <MudText Typo="Typo.h5" GutterBottom="true">@T("Auto-save log")</MudText>
+        @if (_log.Count == 0)
         {
-            case nameof(TaskViewModel.Title): Model.Title = value ?? string.Empty; break;
-            case nameof(TaskViewModel.Notes): Model.Notes = value ?? string.Empty; break;
+            <MudText Typo="Typo.body2" Color="global::MudBlazor.Color.Secondary">
+                @T("Edit \"Notes\" or \"Priority\" and pause typing — entries appear here.")
+            </MudText>
         }
-
-        // Tell EditContext the field changed so AutoSave timers re-arm.
-        EditContext?.NotifyFieldChanged(new FieldIdentifier(Model, fieldName));
-    }
-
-    void OnPriorityInput(string? raw)
-    {
-        if (int.TryParse(raw, out var v))
-            Model.Priority = v;
-
-        EditContext?.NotifyFieldChanged(new FieldIdentifier(Model, nameof(TaskViewModel.Priority)));
-    }
-
-    protected override Task AutoSaveAsync(string fieldName, object? oldValue, object? newValue, CancellationToken cancellationToken)
-    {
-        _log.Insert(0, $"{DateTime.Now:HH:mm:ss.fff}  {fieldName}: {oldValue ?? "∅"} → {newValue ?? "∅"}");
-        if (_log.Count > 10) _log.RemoveRange(10, _log.Count - 10);
-        Toast.AddInfo("Auto-saved {0}", fieldName);
-        return InvokeAsync(StateHasChanged);
-    }
-
-    protected override Task SubmitAsync(CancellationToken cancellationToken)
-    {
-        Toast.AddSuccess("Submitted form");
-        return Task.CompletedTask;
-    }
-}
+        else
+        {
+            <MudList T="string" Dense="true">
+                @foreach (var entry in _log)
+                {
+                    <MudListItem T="string" Icon="@Icons.Material.Filled.Save">
+                        <code>@entry</code>
+                    </MudListItem>
+                }
+            </MudList>
+        }
+    </MudCardContent>
+</MudCard>

@@ -1,3 +1,4 @@
+using Extensions.Projects.Pages;
 using Extensions.Projects.Stubs;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -15,17 +16,17 @@ public sealed class ProjectsArea : IWebsiteArea, IWebsiteServices
         services.TryAddScoped<IProjectSource, InMemoryOrganizationProjectManager>();
     }
 
-    public IReadOnlyList<NavGroup> Navigation { get; } = new[]
-    {
+    public IReadOnlyList<NavGroup> Navigation { get; } =
+    [
         new NavGroup
         {
             Title = "Projects",
             Order = 40,
             Children =
             [
-                new NavItem { Title = "Catalog",  Url = "/projects" },
-                new NavItem { Title = "Switcher", Url = "/projects/switcher" },
+                new NavItem { Title = "Catalog",  Url = CatalogIndex.Route    },
+                new NavItem { Title = "Switcher", Url = ProjectSwitcher.Route },
             ],
         },
-    };
+    ];
 }

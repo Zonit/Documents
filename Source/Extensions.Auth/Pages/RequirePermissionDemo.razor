@@ -1,47 +1,47 @@
-@page "/auth/require-permission"
-@using Zonit.Extensions.Website.Authentication
-@attribute [RequirePermission("users.read")]
 @rendermode InteractiveServer
 @inherits PageBase
 
-<h1>[RequirePermission] page</h1>
+<PageTitle>@T("[RequirePermission] page")</PageTitle>
 
-<p>
-    The whole page is gated by <code>[RequirePermission("users.read")]</code> — the
-    attribute is its own <code>IAuthorizationRequirementData</code> so no
-    <code>AddPolicy(...)</code> is needed. Anonymous visitors land here only because
-    <code>&lt;AuthorizeRouteView&gt;</code> shows our custom 403 panel; logged-in users
-    without <code>users.read</code> see the same.
-</p>
+<MudText Typo="Typo.h3" GutterBottom="true">@T("[RequirePermission] page")</MudText>
 
-<section class="card ok-bg">
-    <p><strong>You are authorized.</strong> Holders of <code>users.read</code> reach this content.</p>
-</section>
+<MudText Class="mb-4">
+    @T("The whole page is gated by [RequirePermission(\"users.read\")] — the attribute is its own IAuthorizationRequirementData so no AddPolicy(...) is needed. Anonymous visitors land here only because <AuthorizeRouteView> shows our custom 403 panel; logged-in users without users.read see the same.")
+</MudText>
 
-<section class="card">
-    <h2>Equivalent declarations</h2>
-    <pre>// Razor / Blazor pages
-@@attribute [RequirePermission("users.read")]
+<MudAlert Severity="Severity.Success" Variant="Variant.Outlined" Class="mb-4">
+    <strong>@T("You are authorized.")</strong> @T("Holders of users.read reach this content.")
+</MudAlert>
+
+<MudCard Outlined="true" Class="mb-4">
+    <MudCardContent>
+        <MudText Typo="Typo.h5" GutterBottom="true">@T("Equivalent declarations")</MudText>
+        <pre class="mud-elevation-1 pa-3" style="background:var(--mud-palette-background-grey);border-radius:4px;">@(@"// Razor / Blazor pages
+@attribute [RequirePermission(""users.read"")]
 
 // Components / classes
-[RequirePermission("users.read")]
+[RequirePermission(""users.read"")]
 public partial class UsersPage : PageBase { }
 
 // Minimal API
-app.MapGet("/api/users", () =&gt; ...)
-   .RequireAuthorization(new RequirePermissionAttribute("users.read"));
+app.MapGet(""/api/users"", () => ...)
+   .RequireAuthorization(new RequirePermissionAttribute(""users.read""));
 
 // Controllers
-[RequirePermission("users.write")]
-public IActionResult Update(...) =&gt; ...;</pre>
-</section>
+[RequirePermission(""users.write"")]
+public IActionResult Update(...) => ...;")</pre>
+    </MudCardContent>
+</MudCard>
 
-<section class="card">
-    <h2>Wildcard requirement</h2>
-    <p>
-        Try clicking the link to a fictional <em>admin</em> page that requires
-        <code>settings.write</code>. The standard <em>user</em> account is denied by both
-        the route view and the <code>RequirePermissionAttribute</code> handler — admin gets in.
-    </p>
-    <a class="btn-primary" href="/auth/admin-only">Admin-only page</a>
-</section>
+<MudCard Outlined="true">
+    <MudCardContent>
+        <MudText Typo="Typo.h5" GutterBottom="true">@T("Wildcard requirement")</MudText>
+        <MudText Class="mb-3">
+            @T("Try clicking the link to a fictional admin page that requires settings.write. The standard user account is denied by both the route view and the RequirePermissionAttribute handler — admin gets in.")
+        </MudText>
+        <MudButton Variant="Variant.Filled" Color="global::MudBlazor.Color.Primary"
+                   Href="@AdminOnly.Route" StartIcon="@Icons.Material.Filled.AdminPanelSettings">
+            @T("Admin-only page")
+        </MudButton>
+    </MudCardContent>
+</MudCard>

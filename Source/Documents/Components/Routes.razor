@@ -6,14 +6,7 @@
 <Router AppAssembly="@typeof(Program).Assembly"
         AdditionalAssemblies="@(new[]
         {
-            typeof(CulturesArea).Assembly,
-            typeof(AuthArea).Assembly,
-            typeof(OrganizationsArea).Assembly,
-            typeof(ProjectsArea).Assembly,
-            typeof(TenantsArea).Assembly,
-            typeof(ComponentsArea).Assembly,
-            typeof(ValueObjectsArea).Assembly,
-            typeof(MudBlazorArea).Assembly,
+            typeof(WebsiteArea).Assembly,
         })">
     <Found Context="routeData">
         @* ZonitRouteView — drop-in replacement that honours [LayoutKey("...")] /
@@ -24,7 +17,7 @@
             <NotAuthorized>
                 <h1>403 — not authorized</h1>
                 <p>You need additional roles or permissions for this page.</p>
-                <p><a href="/login">Log in as a different user</a></p>
+                <p><a href="/docs/login">Log in as a different user</a></p>
             </NotAuthorized>
         </Zonit.Extensions.Website.Layouts.Components.ZonitRouteView>
         <FocusOnNavigate RouteData="@routeData" Selector="h1" />

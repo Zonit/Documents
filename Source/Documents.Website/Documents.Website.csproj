@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+  <ItemGroup>
+    <!-- Page bases (PageBase / PageViewBase / PageEditBase) + IWebsiteArea contract. -->
+    <ProjectReference Include="..\..\..\..\Extensions\Zonit.Extensions\Source\Zonit.Extensions.Website\Zonit.Extensions.Website.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- The landing page is MudBlazor-styled. Providers + assets are scoped inline
+         in Pages/Index.razor (HeadContent + inline MudProviders) so the host root
+         mount does not need a global MudBlazor setup. -->
+    <PackageReference Include="MudBlazor" Version="9.4.0" />
+  </ItemGroup>
+</Project>

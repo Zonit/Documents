@@ -1,121 +1,64 @@
-@page "/components/cookies"
 @rendermode InteractiveServer
 @inherits PageBase
 
-<h1>Cookies</h1>
+<PageTitle>@T("Cookies")</PageTitle>
 
-<p>
-    <code>ICookieProvider</code> wraps two completely different worlds:
-    <strong>HttpOnly</strong> cookies issued server-side by middleware (e.g. the auth
-    <code>Session</code> cookie), and <strong>JS-visible</strong> cookies set from the
-    interactive circuit via <code>document.cookie</code>. Reads pass through a
-    per-circuit snapshot — call <code>RefreshAsync()</code> once on first interactive
-    render to populate it (HTTP-request scope ≠ circuit scope in Blazor Server, so the
-    server-side seed never reaches the circuit on its own).
-</p>
+<MudText Typo="Typo.h3" GutterBottom="true">@T("Cookies")</MudText>
 
-<section class="card stack">
-    <h2>Read &amp; write</h2>
+<MudText Class="mb-4">
+    @T("ICookieProvider wraps two completely different worlds: HttpOnly cookies issued server-side by middleware (e.g. the auth Session cookie), and JS-visible cookies set from the interactive circuit via document.cookie. Reads pass through a per-circuit snapshot — call RefreshAsync() once on first interactive render to populate it (HTTP-request scope ≠ circuit scope in Blazor Server, so the server-side seed never reaches the circuit on its own).")
+</MudText>
 
-    <label>
-        Demo cookie value
-        <input @bind="_value" @bind:event="oninput" />
-    </label>
-
-    <div class="row">
-        <button class="btn-primary" type="button" @onclick="Save">Save (1 day)</button>
-        <button type="button" @onclick="Load">Load</button>
-        <button type="button" @onclick="Delete">Delete</button>
-    </div>
-
-    @if (_loaded is not null)
-    {
-        <p class="muted">Last <code>Get("@Key")</code>: <strong>@_loaded</strong></p>
-    }
-</section>
-
-<section class="card">
-    <h2>Cookies visible to JavaScript</h2>
-    <p class="muted">
-        Hydrated by <code>Cookie.RefreshAsync()</code> on first interactive render.
-        <strong>HttpOnly</strong> cookies (the auth session cookie among them) are
-        <em>not</em> listed here — browsers hide them from
-        <code>document.cookie</code> on purpose. That is a feature, not a bug:
-        HttpOnly is exactly how the session cookie defends itself against XSS.
-    </p>
-
-    @if (Cookie.GetCookies() is { Count: > 0 } cookies)
-    {
-        <table class="creds">
-            <thead><tr><th>Name</th><th>Value</th></tr></thead>
-            <tbody>
-                @foreach (var c in cookies)
-                {
-                    <tr>
-                        <td><code>@c.Name</code></td>
-                        <td><code>@c.Value</code></td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    }
-    else
-    {
-        <p class="muted">
-            (none visible to JS — log in first or click <em>Save</em> above to seed one).
-        </p>
-    }
-
-    <p class="muted">
-        <button type="button" @onclick="Refresh">Refresh from browser</button>
-    </p>
-</section>
-
-@code {
-    const string Key = "example.demo";
-    string _value = "hello";
-    string? _loaded;
-
-    // Hydrate the cookie snapshot from `document.cookie` once the JS interop is live.
-    // The HTTP request that prerendered this page already ran CookieMiddleware, but
-    // we are now in the circuit DI scope which is fresh and empty — without this
-    // refresh, every Get() would return null until the user clicks Save in this very
-    // circuit.
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
+<MudCard Outlined="true" Class="mb-4">
+    <MudCardContent>
+        <MudText Typo="Typo.h5" GutterBottom="true">@T("Read & write")</MudText>
+        <MudTextField @bind-Value="_value" Immediate="true" Variant="Variant.Outlined"
+                      Label="@T("Demo cookie value")" Class="mb-3" />
+        <MudStack Row="true" Spacing="2">
+            <MudButton Variant="Variant.Filled" Color="global::MudBlazor.Color.Primary"
+                       StartIcon="@Icons.Material.Filled.Save" OnClick="Save">@T("Save (1 day)")</MudButton>
+            <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Download" OnClick="Load">@T("Load")</MudButton>
+            <MudButton Variant="Variant.Outlined" Color="global::MudBlazor.Color.Error"
+                       StartIcon="@Icons.Material.Filled.Delete" OnClick="Delete">@T("Delete")</MudButton>
+        </MudStack>
+        @if (_loaded is not null)
         {
-            await Cookie.RefreshAsync();
-            await InvokeAsync(StateHasChanged);
+            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mt-3">
+                @TM("Last Get(): <strong>{0}</strong>", _loaded)
+            </MudAlert>
         }
-    }
+    </MudCardContent>
+</MudCard>
 
-    async Task Save()
-    {
-        await Cookie.SetAsync(Key, _value, TimeSpan.FromDays(1));
-        await Cookie.RefreshAsync();          // pull the just-written cookie back so the table updates
-        Toast.AddSuccess("Saved cookie {0}", Key);
-    }
+<MudCard Outlined="true">
+    <MudCardContent>
+        <MudText Typo="Typo.h5" GutterBottom="true">@T("Cookies visible to JavaScript")</MudText>
+        <MudText Typo="Typo.body2" Color="global::MudBlazor.Color.Secondary" Class="mb-3">
+            @T("Hydrated by Cookie.RefreshAsync() on first interactive render. HttpOnly cookies (the auth session cookie among them) are not listed here — browsers hide them from document.cookie on purpose. That is a feature, not a bug: HttpOnly is exactly how the session cookie defends itself against XSS.")
+        </MudText>
 
-    void Load()
-    {
-        _loaded = Cookie.Get(Key)?.Value ?? "(not set)";
-        if (Cookie.Get(Key) is null) Toast.AddWarning("Cookie {0} is not set", Key);
-    }
+        @if (Cookie.GetCookies() is { Count: > 0 } cookies)
+        {
+            <MudSimpleTable Dense="true" Hover="true" Bordered="true">
+                <thead><tr><th>@T("Name")</th><th>@T("Value")</th></tr></thead>
+                <tbody>
+                    @foreach (var c in cookies)
+                    {
+                        <tr><td><code>@c.Name</code></td><td><code>@c.Value</code></td></tr>
+                    }
+                </tbody>
+            </MudSimpleTable>
+        }
+        else
+        {
+            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
+                @T("(none visible to JS — log in first or click Save above to seed one).")
+            </MudAlert>
+        }
 
-    async Task Delete()
-    {
-        // Convention: set an expired cookie to delete it. Async overload so JS actually
-        // emits `document.cookie = …; Max-Age=0`.
-        await Cookie.SetAsync(Key, string.Empty, DateTime.UtcNow.AddDays(-1));
-        await Cookie.RefreshAsync();          // the deleted cookie should no longer appear
-        _loaded = null;
-        Toast.AddInfo("Deleted {0}", Key);
-    }
-
-    async Task Refresh()
-    {
-        await Cookie.RefreshAsync();
-        Toast.AddInfo("Refreshed cookie snapshot");
-    }
-}
+        <MudButton Variant="Variant.Outlined" Class="mt-3"
+                   StartIcon="@Icons.Material.Filled.Refresh" OnClick="Refresh">
+            @T("Refresh from browser")
+        </MudButton>
+    </MudCardContent>
+</MudCard>

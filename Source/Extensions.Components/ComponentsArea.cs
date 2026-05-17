@@ -1,3 +1,4 @@
+using Extensions.Components.Pages;
 using Microsoft.Extensions.DependencyInjection;
 using Zonit.Extensions;
 using Zonit.Extensions.Website;
@@ -16,23 +17,23 @@ public sealed class ComponentsArea : IWebsiteArea, IWebsiteServices
         services.AddWebsiteLayout<Example.Layouts.DemoBoxLayout>("Demo.Box");
     }
 
-    public IReadOnlyList<NavGroup> Navigation { get; } = new[]
-    {
+    public IReadOnlyList<NavGroup> Navigation { get; } =
+    [
         new NavGroup
         {
             Title = "Components",
             Order = 60,
             Children =
             [
-                new NavItem { Title = "PageViewBase<T>", Url = "/components/page-view" },
-                new NavItem { Title = "PageEditBase<T>", Url = "/components/page-edit" },
-                new NavItem { Title = "AutoSave",        Url = "/components/auto-save" },
-                new NavItem { Title = "Toasts",          Url = "/components/toasts" },
-                new NavItem { Title = "Breadcrumbs",     Url = "/components/breadcrumbs" },
-                new NavItem { Title = "Cookies",         Url = "/components/cookies" },
-                new NavItem { Title = "Layouts",         Url = "/components/layouts" },
-                new NavItem { Title = "State extensions", Url = "/components/state-extensions" },
+                new NavItem { Title = "PageViewBase<T>",  Url = PageView.Route        },
+                new NavItem { Title = "PageEditBase<T>",  Url = PageEdit.Route        },
+                new NavItem { Title = "AutoSave",         Url = AutoSave.Route        },
+                new NavItem { Title = "Toasts",           Url = Toasts.Route          },
+                new NavItem { Title = "Breadcrumbs",      Url = BreadcrumbsDemo.Route },
+                new NavItem { Title = "Cookies",          Url = Cookies.Route         },
+                new NavItem { Title = "Layouts",          Url = Layouts.Route         },
+                new NavItem { Title = "State extensions", Url = StateExtensions.Route },
             ],
         },
-    };
+    ];
 }

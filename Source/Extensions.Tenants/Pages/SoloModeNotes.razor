@@ -1,39 +1,42 @@
-@page "/tenants/solo"
-@inject ITenantProvider Tenant
+@rendermode InteractiveServer
+@inherits PageBase
 
-<h1>Solo vs multi-site</h1>
+<PageTitle>@T("Solo vs multi-site")</PageTitle>
 
-<p>
-    <code>TenantMiddleware</code> auto-detects single-site hosts. There are two cases that
-    end up in the same place:
-</p>
+<MudText Typo="Typo.h3" GutterBottom="true">@T("Solo vs multi-site")</MudText>
 
-<ol>
-    <li>The host did <strong>not</strong> register an <code>ITenantSource</code> at all.</li>
-    <li>The registered manager returned <code>null</code> for the current host name.</li>
-</ol>
+<MudText Class="mb-3">
+    @T("TenantMiddleware auto-detects single-site hosts. There are two cases that end up in the same place:")
+</MudText>
 
-<p>
-    Either way, the middleware seeds <code>ITenantRepository</code> with
-    <code>Tenant.Solo</code> — a sentinel with <code>Id == Guid.Empty</code> and
-    <code>Domain == "*"</code>. The result: <code>ITenantProvider.Current</code> is never
-    <code>null</code>, settings always surface either persisted overrides or the
-    compile-time defaults, and pages don't need null-checks.
-</p>
+<MudList T="string" Dense="true" Class="mb-4">
+    <MudListItem T="string" Icon="@Icons.Material.Filled.LooksOne">@T("The host did NOT register an ITenantSource at all.")</MudListItem>
+    <MudListItem T="string" Icon="@Icons.Material.Filled.LooksTwo">@T("The registered manager returned null for the current host name.")</MudListItem>
+</MudList>
 
-<section class="card">
-    <h2>Right now</h2>
-    <dl>
-        <dt>Id</dt>      <dd><code>@Tenant.Current?.Id</code></dd>
-        <dt>Domain</dt>  <dd>@Tenant.Current?.Domain</dd>
-        <dt>IsSolo</dt>  <dd>@Tenant.Current?.IsSolo</dd>
-        <dt>Vars</dt>    <dd>@(Tenant.Current?.Variables.Count ?? 0)</dd>
-    </dl>
-</section>
+<MudText Class="mb-4">
+    @T("Either way, the middleware seeds ITenantRepository with Tenant.Solo — a sentinel with Id == Guid.Empty and Domain == \"*\". The result: ITenantProvider.Current is never null, settings always surface either persisted overrides or the compile-time defaults, and pages don't need null-checks.")
+</MudText>
 
-<section class="card">
-    <h2>How to flip the demo</h2>
-    <pre>// Program.cs
+<MudCard Outlined="true" Class="mb-4">
+    <MudCardContent>
+        <MudText Typo="Typo.h5" GutterBottom="true">@T("Right now")</MudText>
+        <MudSimpleTable Dense="true" Bordered="true">
+            <tbody>
+                <tr><td><strong>Id</strong></td><td><code>@Tenant.Current?.Id</code></td></tr>
+                <tr><td><strong>@T("Domain")</strong></td><td>@Tenant.Current?.Domain</td></tr>
+                <tr><td><strong>IsSolo</strong></td><td>@Tenant.Current?.IsSolo</td></tr>
+                <tr><td><strong>@T("Vars")</strong></td><td>@(Tenant.Current?.Variables.Count ?? 0)</td></tr>
+            </tbody>
+        </MudSimpleTable>
+    </MudCardContent>
+</MudCard>
+
+<MudCard Outlined="true">
+    <MudCardContent>
+        <MudText Typo="Typo.h5" GutterBottom="true">@T("How to flip the demo")</MudText>
+        <pre class="mud-elevation-1 pa-3" style="background:var(--mud-palette-background-grey);border-radius:4px;">@(@"// Program.cs
 // Comment this out to force solo-mode globally:
-// builder.Services.AddScoped&lt;ITenantSource, InMemoryTenantManager&gt;();</pre>
-</section>
+// builder.Services.AddScoped<ITenantSource, InMemoryTenantManager>();")</pre>
+    </MudCardContent>
+</MudCard>

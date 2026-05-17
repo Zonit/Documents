@@ -1,23 +1,15 @@
-@page "/components/layouts/static-box"
-@attribute [LayoutKey("Demo.Box")]
 @inherits PageBase
 
-<h1>[LayoutKey("Demo.Box")] — static</h1>
+<h1>[LayoutKey("Demo.Box")] — @T("static")</h1>
 
 <p>
-    This page is rendered inside <code>DemoBoxLayout</code> purely because of the
-    <code>[LayoutKey("Demo.Box")]</code> attribute on the class. There is <em>no</em>
-    <code>@@layout</code> directive in this file and the page's compiled type carries
-    no compile-time reference to <code>DemoBoxLayout</code> — the resolver looked the
-    key up in <code>ILayoutRegistry</code> at render time.
+    @T("This page is rendered inside DemoBoxLayout purely because of the [LayoutKey(\"Demo.Box\")] attribute on the class. There is no @layout directive in this file and the page's compiled type carries no compile-time reference to DemoBoxLayout — the resolver looked the key up in ILayoutRegistry at render time.")
 </p>
 
 <p>
-    Note that <strong>none</strong> of the usual chrome (top nav, side menu, footer)
-    is present — that's because the layout-by-key resolution wins over the Site
-    default <code>MainLayout</code>.
+    @T("Note that none of the usual chrome (top nav, side menu, footer) is present — that's because the layout-by-key resolution wins over the Site default MainLayout.")
 </p>
 
 <p>
-    <a href="/components/layouts">← Back</a>
+    <a href="@Layouts.Route">← @T("Back")</a>
 </p>

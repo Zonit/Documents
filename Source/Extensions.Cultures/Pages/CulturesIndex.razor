@@ -1,62 +1,76 @@
-@page "/cultures"
 @rendermode InteractiveServer
 @inherits PageBase
 
-<h1>Cultures — overview</h1>
+<PageTitle>@T("Cultures — overview")</PageTitle>
 
-<p>
-    The host wires <code>ICultureProvider</code> (read) and <code>ICultureManager</code>
-    (write). Both are <strong>scoped</strong>; mutations fire <code>OnChange</code> which
-    propagates to providers, layouts and pages.
-</p>
+<MudText Typo="Typo.h3" GutterBottom="true">@T("Cultures — overview")</MudText>
 
-<p class="muted">
-    Inside this Razor file we use <code>@@inherits PageBase</code> instead of <code>@@inject</code>
-    so that the page automatically gets <code>Culture</code>, <code>Workspace</code>,
-    <code>Catalog</code>, <code>Authenticated</code>, <code>Toast</code>, <code>Cookie</code>
-    and <code>BreadcrumbsProvider</code> as protected properties — straight from
-    <code>ExtensionsBase</code>.
-</p>
+<MudText Class="mb-4">
+    @TM("The host wires {0} (read) and {1} (write). Both are scoped; mutations fire {2} which propagates to providers, layouts and pages.",
+        "<code>ICultureProvider</code>",
+        "<code>ICultureManager</code>",
+        "<code>OnChange</code>")
+</MudText>
 
-<section class="card">
-    <h2>Quick switcher</h2>
-    <p>Current culture: <strong>@Culture.Current.Value</strong></p>
-    <select @onchange="OnCultureChanged" value="@Culture.Current.Value">
-        @foreach (var lang in CultureManager.Supported)
-        {
-            <option value="@lang.Code">@lang.NativeName (@lang.Code)</option>
-        }
-    </select>
-    <p class="muted">
-        Switching here is reflected globally — the layout's switcher and any page subscribed
-        to <code>Culture.OnChange</code> re-render.
-    </p>
-</section>
+<MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mb-6">
+    @T("Inside this Razor file we use @inherits PageBase instead of @inject so the page automatically gets Culture, Workspace, Catalog, Authenticated, Toast, Cookie and BreadcrumbsProvider as protected properties — straight from ExtensionsBase.")
+</MudAlert>
 
-<section class="card">
-    <h2>Inline translation</h2>
-    <p>The two helpers are equivalent:</p>
-    <pre>Culture.Translate("Welcome").Value
-Translated t = Culture.Translate("Hello {0}!", "world");  // implicit-string</pre>
-    <ul>
-        <li>Translate: <strong>@Culture.Translate("Welcome").Value</strong></li>
-        <li>With args: <strong>@Culture.Translate("Hello {0}!", "world").Value</strong></li>
-    </ul>
-    <p class="muted">
-        No translations registered — the missing-key tracker stores the request and the
-        provider returns the input verbatim. A real host wires
-        <code>ITranslationRepository</code> with a real source.
-    </p>
-</section>
+<MudCard Outlined="true" Class="mb-4">
+    <MudCardContent>
+        <MudText Typo="Typo.h5" GutterBottom="true">@T("Quick switcher")</MudText>
+        <MudText Class="mb-2">@TM("Current culture: <strong>{0}</strong>", Culture.Current.Value)</MudText>
 
-@code {
-    [Inject] ICultureManager CultureManager { get; set; } = default!;
+        <MudSelect T="string" Value="@Culture.Current.Value"
+                   ValueChanged="@(v => CultureManager.SetCulture(v))"
+                   Label="@T("Culture")" Variant="Variant.Outlined" Dense="true">
+            @foreach (var lang in CultureManager.Supported)
+            {
+                <MudSelectItem T="string" Value="@lang.Code">@lang.NativeName (@lang.Code)</MudSelectItem>
+            }
+        </MudSelect>
 
-    // PageBase already subscribes Culture.OnChange → StateHasChanged and disposes itself.
+        <MudText Typo="Typo.caption" Color="global::MudBlazor.Color.Secondary" Class="mt-2 d-block">
+            @T("Switching here is reflected globally — the layout's switcher and any page subscribed to Culture.OnChange re-renders.")
+        </MudText>
+    </MudCardContent>
+</MudCard>
 
-    void OnCultureChanged(ChangeEventArgs e)
-    {
-        if (e.Value is string code)
-            CultureManager.SetCulture(code);
-    }
-}
+<MudCard Outlined="true" Class="mb-4">
+    <MudCardContent>
+        <MudText Typo="Typo.h5" GutterBottom="true">@T("Inline translation")</MudText>
+        <MudText Class="mb-2">@T("The two helpers are equivalent:")</MudText>
+
+        <pre class="mud-elevation-1 pa-3" style="background:var(--mud-palette-background-grey);border-radius:4px;">@(@"Culture.Translate(""Welcome"").Value
+Translated t = Culture.Translate(""Hello {0}!"", ""world"");  // implicit-string")</pre>
+
+        <MudList T="string" Dense="true">
+            <MudListItem T="string">@TM("Translate: <strong>{0}</strong>", Culture.Translate("Welcome").Value)</MudListItem>
+            <MudListItem T="string">@TM("With args: <strong>{0}</strong>", Culture.Translate("Hello {0}!", "world").Value)</MudListItem>
+        </MudList>
+
+        <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Class="mt-3">
+            @T("No translations registered — the missing-key tracker stores the request and the provider returns the input verbatim. A real host wires ITranslationRepository with a real source.")
+        </MudAlert>
+    </MudCardContent>
+</MudCard>
+
+<MudCard Outlined="true">
+    <MudCardContent>
+        <MudText Typo="Typo.h5" GutterBottom="true">@T("API surface")</MudText>
+        <MudSimpleTable Dense="true" Hover="true" Bordered="true">
+            <thead>
+                <tr><th>@T("Member")</th><th>@T("Returns")</th><th>@T("Purpose")</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>Culture.Current</code></td><td><code>Language</code></td><td>@T("Active culture as value object.")</td></tr>
+                <tr><td><code>Culture.Translate(key)</code></td><td><code>Translated</code></td><td>@T("Look up a translation for the active culture.")</td></tr>
+                <tr><td><code>Culture.Translate(key, args)</code></td><td><code>Translated</code></td><td>@T("Same with composite-format arguments.")</td></tr>
+                <tr><td><code>Culture.ClientTimeZone(utc)</code></td><td><code>DateTime</code></td><td>@T("Convert UTC to the user's selected zone.")</td></tr>
+                <tr><td><code>CultureManager.Supported</code></td><td><code>IReadOnlyList&lt;Language&gt;</code></td><td>@T("Languages declared via CultureOption.SupportedCultures.")</td></tr>
+                <tr><td><code>CultureManager.SetCulture(code)</code></td><td><code>void</code></td><td>@T("Persist a new culture in the cookie and broadcast OnChange.")</td></tr>
+                <tr><td><code>CultureManager.SetTimeZone(id)</code></td><td><code>void</code></td><td>@T("Persist a new IANA / Windows zone id and broadcast OnChange.")</td></tr>
+            </tbody>
+        </MudSimpleTable>
+    </MudCardContent>
+</MudCard>

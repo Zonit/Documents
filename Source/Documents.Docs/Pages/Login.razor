@@ -1,0 +1,51 @@
+@inherits PageBase
+@attribute [Route(Route)]
+
+@*
+    Plain HTML form posting to <PathBase>/auth/login. Deliberately NOT @rendermode
+    InteractiveServer — login flips the auth cookie, and Blazor interactive handling
+    can't issue cookies mid-circuit. A full-page POST + redirect lands us in an
+    authenticated state on the next request, which is the cleanest pattern.
+
+    The form action is RELATIVE ("auth/login") so it resolves against this page's URL
+    (.../docs/login → POST .../docs/auth/login), matching AuthArea.MapEndpoints which
+    runs inside the /docs branch.
+*@
+
+<PageTitle>@T("Log in")</PageTitle>
+
+<MudContainer MaxWidth="global::MudBlazor.MaxWidth.Small" Class="mt-8">
+    <MudText Typo="global::MudBlazor.Typo.h3" GutterBottom="true">@T("Log in")</MudText>
+
+    <MudText Class="mb-4">
+        @TM("Demo accounts: {0} (full permissions) or {1} (regular).",
+            "<code>admin / admin</code>",
+            "<code>user / user</code>")
+    </MudText>
+
+    @if (string.Equals(Error, "invalid", StringComparison.OrdinalIgnoreCase))
+    {
+        <MudAlert Severity="global::MudBlazor.Severity.Error" Variant="global::MudBlazor.Variant.Filled" Class="mb-4">
+            @T("Invalid credentials. Try the demo accounts above.")
+        </MudAlert>
+    }
+
+    <MudPaper Class="pa-6" Elevation="2">
+        <form action="auth/login" method="post">
+            <MudStack Spacing="3">
+                <MudTextField T="string" Name="username" Label="@T("Username")"
+                              Required="true" autocomplete="username" autofocus />
+                <MudTextField T="string" Name="password" Label="@T("Password")"
+                              InputType="global::MudBlazor.InputType.Password"
+                              Required="true" autocomplete="current-password" />
+                <input type="hidden" name="returnUrl" value="@ReturnUrl" />
+                <MudButton ButtonType="global::MudBlazor.ButtonType.Submit"
+                           Variant="global::MudBlazor.Variant.Filled"
+                           Color="global::MudBlazor.Color.Primary"
+                           StartIcon="@(global::MudBlazor.Icons.Material.Filled.Login)">
+                    @T("Log in")
+                </MudButton>
+            </MudStack>
+        </form>
+    </MudPaper>
+</MudContainer>

@@ -1,14 +1,20 @@
 using Documents;
 using Documents.Components;
+using Documents.Docs;
+using Documents.Website;
 using Zonit.Extensions;
 using Zonit.Extensions.Cultures.Options;
 using Zonit.Extensions.Website;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// AddWebsite registers framework services AND every IWebsiteArea so each area's
+// ConfigureServices runs against the DI container before app.Build(). The per-mount
+// AddArea<T>() calls below only *activate* a registered area on a specific mount.
 builder.Services.AddWebsite(opts =>
 {
-    opts.AddArea<HomeArea>();
+    opts.AddArea<WebsiteArea>();
+    opts.AddArea<DocsArea>();
     opts.AddArea<CulturesArea>();
     opts.AddArea<AuthArea>();
     opts.AddArea<OrganizationsArea>();
@@ -35,28 +41,17 @@ var app = builder.Build();
 // pipeline; every app.MapWhen branch registered AFTER it would be unreachable. The
 // framework now fails fast with an InvalidOperationException when this order is
 // violated.
-app.UseDashboard("/dashboard", o =>
+// /docs — full documentation site. The Zonit.Dashboard mount brings MudBlazor chrome
+// (theme + providers) so every doc page can use MudBlazor markup directly. All
+// feature-area projects ship pages under their own URL prefix (e.g. /cultures, /auth);
+// when mounted here they automatically become /docs/cultures, /docs/auth, ... via the
+// dashboard's UsePathBase.
+app.UseDashboard("/docs", o =>
 {
     o.Compression = !builder.Environment.IsDevelopment();
     o.HttpsRedirection = !builder.Environment.IsDevelopment();
 
-    o.AddArea<ComponentsArea>();
-    o.AddArea<MudBlazorArea>();
-    o.AddArea<ValueObjectsArea>();
-
-    o.Layout.LeftDrawerWidth = 260;
-    o.Layout.ShowBreadcrumbs = true;
-});
-
-app.UseWebsite<App>("/", o =>
-{
-    o.Mode = WebsiteMode.Server;
-    // Browser-Link / dotnet-watch can't inject scripts into a Brotli-compressed body.
-    o.Compression = !builder.Environment.IsDevelopment();
-    // dev demo runs HTTP-only on a random port — opt out of HTTPS redirect.
-    o.HttpsRedirection = !builder.Environment.IsDevelopment();
-
-    o.AddArea<HomeArea>();
+    o.AddArea<DocsArea>();
     o.AddArea<CulturesArea>();
     o.AddArea<AuthArea>();
     o.AddArea<OrganizationsArea>();
@@ -65,6 +60,22 @@ app.UseWebsite<App>("/", o =>
     o.AddArea<ComponentsArea>();
     o.AddArea<ValueObjectsArea>();
     o.AddArea<MudBlazorArea>();
+
+    o.Layout.LeftDrawerWidth = 260;
+    o.Layout.ShowBreadcrumbs = true;
+});
+
+// / — minimal public landing. Carries only the WebsiteArea (single marketing page
+// that links into /docs). Heavy demos do NOT live here so the root mount stays small.
+app.UseWebsite<App>("/", o =>
+{
+    o.Mode = WebsiteMode.Server;
+    // Browser-Link / dotnet-watch can't inject scripts into a Brotli-compressed body.
+    o.Compression = !builder.Environment.IsDevelopment();
+    // dev demo runs HTTP-only on a random port — opt out of HTTPS redirect.
+    o.HttpsRedirection = !builder.Environment.IsDevelopment();
+
+    o.AddArea<WebsiteArea>();
 });
 
 app.Run();

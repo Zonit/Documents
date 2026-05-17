@@ -1,100 +1,99 @@
-@page "/vo/strings"
 @rendermode InteractiveServer
+@inherits PageBase
+@using MudBlazor
 
-<h1>String-shaped value objects</h1>
+<PageTitle>@T("String-shaped value objects")</PageTitle>
 
-<p>
-    Each VO is a tiny <code>readonly struct</code> with an implicit
-    <code>string → VO</code> conversion, a hand-rolled <code>JsonConverter</code> and a
-    <code>TypeConverter</code> — they work transparently with JSON, EF Core, model binding
-    and forms.
-</p>
+<MudText Typo="Typo.h3" GutterBottom="true">@T("String-shaped value objects")</MudText>
 
-<section class="card">
-    <h2>Title</h2>
-    @{ Title title = _titleInput; }
-    <input class="input" @bind="_titleInput" @bind:event="oninput" />
-    <pre>title.HasValue -> @title.HasValue
-title.Value    -> "@title.Value"
-title.Length   -> @title.Length</pre>
-</section>
+<MudText Class="mb-4">
+    @T("Each VO is a tiny readonly struct with an implicit string → VO conversion, a hand-rolled JsonConverter and a TypeConverter — they work transparently with JSON, EF Core, model binding and forms.")
+</MudText>
 
-<section class="card">
-    <h2>Url</h2>
-    @{ Url url = _urlInput; }
-    <input class="input" @bind="_urlInput" @bind:event="oninput" />
-    <pre>url.HasValue       -> @url.HasValue
-url.Value          -> "@url.Value"
-url.IsAbsolute     -> @url.IsAbsolute</pre>
-</section>
+@{ Title title = _titleInput; }
+<MudCard Outlined="true" Class="mb-4">
+    <MudCardContent>
+        <MudText Typo="Typo.h5" GutterBottom="true">Title</MudText>
+        <MudTextField @bind-Value="_titleInput" Immediate="true" Variant="Variant.Outlined" Label="@T("Input")" Class="mb-3" />
+        <pre class="mud-elevation-1 pa-3" style="background:var(--mud-palette-background-grey);border-radius:4px;">@($@"title.HasValue -> {title.HasValue}
+title.Value    -> ""{title.Value}""
+title.Length   -> {title.Length}")</pre>
+    </MudCardContent>
+</MudCard>
 
-<section class="card">
-    <h2>UrlSlug</h2>
-    <p>Slug normalises the input — lowercase, hyphens, ASCII only.</p>
-    @{ UrlSlug.TryCreate(_slugInput, out var slug); }
-    <input class="input" @bind="_slugInput" @bind:event="oninput" />
-    <pre>UrlSlug.TryCreate("@_slugInput", out var slug) -> @(slug.HasValue ? slug.Value : "(invalid)")</pre>
-</section>
+@{ Url url = _urlInput; }
+<MudCard Outlined="true" Class="mb-4">
+    <MudCardContent>
+        <MudText Typo="Typo.h5" GutterBottom="true">Url</MudText>
+        <MudTextField @bind-Value="_urlInput" Immediate="true" Variant="Variant.Outlined" Label="@T("Input")" Class="mb-3" />
+        <pre class="mud-elevation-1 pa-3" style="background:var(--mud-palette-background-grey);border-radius:4px;">@($@"url.HasValue       -> {url.HasValue}
+url.Value          -> ""{url.Value}""
+url.IsAbsolute     -> {url.IsAbsolute}")</pre>
+    </MudCardContent>
+</MudCard>
 
-<section class="card">
-    <h2>UrlPath</h2>
-    <p>
-        In-site path — the bit after the host. Rejects absolute-looking inputs
-        (<code>http://...</code>, <code>//cdn/...</code>) so a field typed
-        <code>UrlPath</code> can never accidentally hold an external URL.
-    </p>
-    @{ var pathOk = UrlPath.TryParse(_pathInput, null, out var pathVo); }
-    <input class="input" @bind="_pathInput" @bind:event="oninput" />
-    <pre>UrlPath.TryParse("@_pathInput") -> @(pathOk ? pathVo.Value : "(invalid)")
-  .IsRooted                         -> @(pathOk ? pathVo.IsRooted.ToString() : "—")</pre>
-</section>
+@{ UrlSlug.TryCreate(_slugInput, out var slug); }
+<MudCard Outlined="true" Class="mb-4">
+    <MudCardContent>
+        <MudText Typo="Typo.h5" GutterBottom="true">UrlSlug</MudText>
+        <MudText Class="mb-2">@T("Slug normalises the input — lowercase, hyphens, ASCII only.")</MudText>
+        <MudTextField @bind-Value="_slugInput" Immediate="true" Variant="Variant.Outlined" Label="@T("Input")" Class="mb-3" />
+        <pre class="mud-elevation-1 pa-3" style="background:var(--mud-palette-background-grey);border-radius:4px;">@($@"UrlSlug.TryCreate(""{_slugInput}"", out var slug) -> {(slug.HasValue ? slug.Value : "(invalid)")}")</pre>
+    </MudCardContent>
+</MudCard>
 
-<section class="card">
-    <h2>Description (max 160)</h2>
-    <p>
-        Short-form text with a hard cap (typical meta-description / card-subtitle).
-        Whitespace is collapsed; grapheme-correct length so emoji count as 1.
-    </p>
-    @{ Description.TryParse(_descriptionInput, null, out var desc); }
-    <textarea class="input" rows="2" @bind="_descriptionInput" @bind:event="oninput"></textarea>
-    <pre>Description.TryParse(...) -> @(desc.HasValue ? "ok" : "(invalid)")
-  .Length                  -> @desc.Length / @Description.MaxLength
-  .Value                   -> "@desc.Value"</pre>
-</section>
+@{ var pathOk = UrlPath.TryParse(_pathInput, null, out var pathVo); }
+<MudCard Outlined="true" Class="mb-4">
+    <MudCardContent>
+        <MudText Typo="Typo.h5" GutterBottom="true">UrlPath</MudText>
+        <MudText Class="mb-2">
+            @T("In-site path — the bit after the host. Rejects absolute-looking inputs (http://..., //cdn/...) so a field typed UrlPath can never accidentally hold an external URL.")
+        </MudText>
+        <MudTextField @bind-Value="_pathInput" Immediate="true" Variant="Variant.Outlined" Label="@T("Input")" Class="mb-3" />
+        <pre class="mud-elevation-1 pa-3" style="background:var(--mud-palette-background-grey);border-radius:4px;">@($@"UrlPath.TryParse(""{_pathInput}"") -> {(pathOk ? pathVo.Value : "(invalid)")}
+  .IsRooted                         -> {(pathOk ? pathVo.IsRooted.ToString() : "—")}")</pre>
+    </MudCardContent>
+</MudCard>
 
-<section class="card">
-    <h2>Content (no length cap)</h2>
-    <p>
-        Long-form text (HTML, markdown). Trims leading/trailing whitespace; preserves
-        everything in between including embedded markup.
-    </p>
-    @{ Content content = _contentInput; }
-    <textarea class="input" rows="4" @bind="_contentInput" @bind:event="oninput"></textarea>
-    <pre>content.HasValue -> @content.HasValue
-content.Length   -> @content.Length</pre>
-</section>
+@{ Description.TryParse(_descriptionInput, null, out var desc); }
+<MudCard Outlined="true" Class="mb-4">
+    <MudCardContent>
+        <MudText Typo="Typo.h5" GutterBottom="true">@T("Description (max 160)")</MudText>
+        <MudText Class="mb-2">
+            @T("Short-form text with a hard cap (typical meta-description / card-subtitle). Whitespace is collapsed; grapheme-correct length so emoji count as 1.")
+        </MudText>
+        <MudTextField @bind-Value="_descriptionInput" Immediate="true" Variant="Variant.Outlined" Lines="2" Label="@T("Input")" Class="mb-3" />
+        <pre class="mud-elevation-1 pa-3" style="background:var(--mud-palette-background-grey);border-radius:4px;">@($@"Description.TryParse(...) -> {(desc.HasValue ? "ok" : "(invalid)")}
+  .Length                  -> {desc.Length} / {Description.MaxLength}
+  .Value                   -> ""{desc.Value}""")</pre>
+    </MudCardContent>
+</MudCard>
 
-<section class="card">
-    <h2>Credential — auto-detected kind</h2>
-    <p>
-        One field, four kinds: GUID, e-mail, phone, username. The user types once —
-        the VO figures out what they meant.
-    </p>
-    @{ var credOk = Credential.TryParse(_credInput, null, out var cred); }
-    <input class="input" @bind="_credInput" @bind:event="oninput"
-           placeholder="email@example.com / +48600700800 / jkowalski / 00000000-0000-0000-0000-000000000000" />
-    <pre>Credential.TryParse("@_credInput") -> @(credOk ? "ok" : "(unrecognised)")
-  .Kind     -> @cred.Kind
-  .Value    -> "@cred.Value"
-  .Id       -> @(cred.IsId ? cred.Id.ToString() : "—")</pre>
-</section>
+@{ Content content = _contentInput; }
+<MudCard Outlined="true" Class="mb-4">
+    <MudCardContent>
+        <MudText Typo="Typo.h5" GutterBottom="true">@T("Content (no length cap)")</MudText>
+        <MudText Class="mb-2">
+            @T("Long-form text (HTML, markdown). Trims leading/trailing whitespace; preserves everything in between including embedded markup.")
+        </MudText>
+        <MudTextField @bind-Value="_contentInput" Immediate="true" Variant="Variant.Outlined" Lines="4" Label="@T("Input")" Class="mb-3" />
+        <pre class="mud-elevation-1 pa-3" style="background:var(--mud-palette-background-grey);border-radius:4px;">@($@"content.HasValue -> {content.HasValue}
+content.Length   -> {content.Length}")</pre>
+    </MudCardContent>
+</MudCard>
 
-@code {
-    string _titleInput       = "Hello Zonit";
-    string _urlInput         = "https://zonit.dev";
-    string _slugInput        = "Hello World!";
-    string _pathInput        = "/orders?id=42";
-    string _descriptionInput = "A short tagline that fits in a card subtitle.";
-    string _contentInput     = "<p>Long-form <strong>HTML</strong> goes here.</p>";
-    string _credInput        = "jan@example.com";
-}
+@{ var credOk = Credential.TryParse(_credInput, null, out var cred); }
+<MudCard Outlined="true">
+    <MudCardContent>
+        <MudText Typo="Typo.h5" GutterBottom="true">@T("Credential — auto-detected kind")</MudText>
+        <MudText Class="mb-2">
+            @T("One field, four kinds: GUID, e-mail, phone, username. The user types once — the VO figures out what they meant.")
+        </MudText>
+        <MudTextField @bind-Value="_credInput" Immediate="true" Variant="Variant.Outlined"
+                      Label="@T("Input")" Placeholder="email@example.com / +48600700800 / jkowalski / 00000000-..." Class="mb-3" />
+        <pre class="mud-elevation-1 pa-3" style="background:var(--mud-palette-background-grey);border-radius:4px;">@($@"Credential.TryParse(""{_credInput}"") -> {(credOk ? "ok" : "(unrecognised)")}
+  .Kind     -> {cred.Kind}
+  .Value    -> ""{cred.Value}""
+  .Id       -> {(cred.IsId ? cred.Id.ToString() : "—")}")</pre>
+    </MudCardContent>
+</MudCard>

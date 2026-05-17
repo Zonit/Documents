@@ -3,4 +3,7 @@
     <ProjectReference Include="..\..\..\..\Extensions\Zonit.Extensions\Source\Zonit.Extensions.Website\Zonit.Extensions.Website.csproj" />
     <ProjectReference Include="..\Extensions.Shared\Extensions.Shared.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="MudBlazor" Version="9.4.0" />
+  </ItemGroup>
 </Project>

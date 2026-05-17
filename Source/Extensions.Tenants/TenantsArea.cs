@@ -1,3 +1,4 @@
+using Extensions.Tenants.Pages;
 using Extensions.Tenants.Stubs;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -20,17 +21,17 @@ public sealed class TenantsArea : IWebsiteArea, IWebsiteServices
         services.TryAddScoped<ITenantSource, InMemoryTenantManager>();
     }
 
-    public IReadOnlyList<NavGroup> Navigation { get; } = new[]
-    {
+    public IReadOnlyList<NavGroup> Navigation { get; } =
+    [
         new NavGroup
         {
             Title = "Tenants",
             Order = 50,
             Children =
             [
-                new NavItem { Title = "Settings", Url = "/tenants" },
-                new NavItem { Title = "Solo mode", Url = "/tenants/solo" },
+                new NavItem { Title = "Settings",  Url = TenantSettingsIndex.Route },
+                new NavItem { Title = "Solo mode", Url = SoloModeNotes.Route       },
             ],
         },
-    };
+    ];
 }

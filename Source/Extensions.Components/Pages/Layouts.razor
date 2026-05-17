@@ -1,70 +1,55 @@
-@page "/components/layouts"
 @rendermode InteractiveServer
 @inherits PageBase
 
-<h1>Layout system</h1>
+<PageTitle>@T("Layout system")</PageTitle>
 
-<p>
-    Zonit exposes a <strong>string-keyed layout registry</strong>. A plug-in declares
-    its layout choice via attribute (<code>[LayoutKey("...")]</code> or
-    <code>[NoLayout]</code>) <em>or</em> sets <code>LayoutKey</code> dynamically at
-    runtime via <code>PageBase</code>. The host wires concrete <code>LayoutComponentBase</code>
-    types to those keys with <code>services.AddWebsiteLayout&lt;T&gt;("key")</code> —
-    so a plug-in never needs an assembly reference to the layout that wraps it.
-</p>
+<MudText Typo="Typo.h3" GutterBottom="true">@T("Layout system")</MudText>
 
-<section class="card stack">
-    <h2>Static — <code>[LayoutKey("Demo.Box")]</code></h2>
-    <p>
-        This page is wrapped by the framework default (<code>MainLayout</code>). The
-        link below opens a sibling page declared <em>only</em> with
-        <code>@@attribute [LayoutKey("Demo.Box")]</code> — it has no
-        <code>@@layout</code> directive and no reference to the layout class.
-    </p>
-    <p>
-        <a href="/components/layouts/static-box" class="btn-primary">Open static [LayoutKey] demo</a>
-    </p>
-</section>
+<MudText Class="mb-4">
+    @T("Zonit exposes a string-keyed layout registry. A plug-in declares its layout choice via attribute ([LayoutKey(\"...\")] or [NoLayout]) or sets LayoutKey dynamically at runtime via PageBase. The host wires concrete LayoutComponentBase types to those keys with services.AddWebsiteLayout<T>(\"key\") — so a plug-in never needs an assembly reference to the layout that wraps it.")
+</MudText>
 
-<section class="card stack">
-    <h2>Static — <code>[NoLayout]</code></h2>
-    <p>
-        Opts out of <em>every</em> layout — even <code>MainLayout</code> won't wrap it.
-        Useful for embeddable widgets, OAuth popups, brand-new full-bleed landing pages,
-        or error pages that must render even when the main layout is broken.
-    </p>
-    <p>
-        <a href="/components/layouts/no-layout">Open [NoLayout] demo</a>
-    </p>
-</section>
+<MudCard Outlined="true" Class="mb-4">
+    <MudCardContent>
+        <MudText Typo="Typo.h5" GutterBottom="true">@T("Static — [LayoutKey(\"Demo.Box\")]")</MudText>
+        <MudText Class="mb-3">
+            @T("This page is wrapped by the framework default (MainLayout). The link below opens a sibling page declared only with @attribute [LayoutKey(\"Demo.Box\")] — it has no @layout directive and no reference to the layout class.")
+        </MudText>
+        <MudButton Variant="Variant.Filled" Color="global::MudBlazor.Color.Primary"
+                   Href="@LayoutStaticBox.Route" StartIcon="@Icons.Material.Filled.OpenInNew">
+            @T("Open static [LayoutKey] demo")
+        </MudButton>
+    </MudCardContent>
+</MudCard>
 
-<section class="card stack">
-    <h2>Dynamic — <code>PageBase.LayoutKey</code></h2>
-    <p>
-        Sometimes the layout choice depends on data only known at runtime. Click below
-        to flip <em>this very page</em> into the <code>Demo.Box</code> layout without
-        navigating. The first render uses the default; the second render reflects the
-        new context.
-    </p>
-    <div class="row">
-        <button class="btn-primary" type="button" @onclick="UseBox">Switch to Demo.Box</button>
-        <button type="button" @onclick="UseNone">Switch to no layout</button>
-        <button type="button" @onclick="Reset">Reset to default</button>
-    </div>
-    <p class="muted">Current dynamic override: <strong>@CurrentState</strong></p>
-    <p class="muted">Navigating to a different page automatically clears the override.</p>
-</section>
+<MudCard Outlined="true" Class="mb-4">
+    <MudCardContent>
+        <MudText Typo="Typo.h5" GutterBottom="true">@T("Static — [NoLayout]")</MudText>
+        <MudText Class="mb-3">
+            @T("Opts out of every layout — even MainLayout won't wrap it. Useful for embeddable widgets, OAuth popups, brand-new full-bleed landing pages, or error pages that must render even when the main layout is broken.")
+        </MudText>
+        <MudButton Variant="Variant.Outlined" Href="@LayoutNoLayout.Route" StartIcon="@Icons.Material.Filled.OpenInNew">
+            @T("Open [NoLayout] demo")
+        </MudButton>
+    </MudCardContent>
+</MudCard>
 
-@code {
-    string CurrentState => LayoutKey switch
-    {
-        null when LayoutContext.IsNoLayout => "(none — render raw)",
-        null => "(no override — using static / default)",
-        ""   => "(empty — Site default)",
-        var k => $"\"{k}\"",
-    };
-
-    void UseBox()  => LayoutKey = "Demo.Box";
-    void UseNone() => LayoutKey = null; // null => render with no layout (like [NoLayout])
-    void Reset()   => LayoutContext.ClearOverride();
-}
+<MudCard Outlined="true">
+    <MudCardContent>
+        <MudText Typo="Typo.h5" GutterBottom="true">@T("Dynamic — PageBase.LayoutKey")</MudText>
+        <MudText Class="mb-3">
+            @T("Sometimes the layout choice depends on data only known at runtime. Click below to flip this very page into the Demo.Box layout without navigating. The first render uses the default; the second render reflects the new context.")
+        </MudText>
+        <MudStack Row="true" Spacing="2" Wrap="Wrap.Wrap">
+            <MudButton Variant="Variant.Filled" Color="global::MudBlazor.Color.Primary" OnClick="UseBox">@T("Switch to Demo.Box")</MudButton>
+            <MudButton Variant="Variant.Outlined" OnClick="UseNone">@T("Switch to no layout")</MudButton>
+            <MudButton Variant="Variant.Text" OnClick="Reset">@T("Reset to default")</MudButton>
+        </MudStack>
+        <MudText Typo="Typo.caption" Color="global::MudBlazor.Color.Secondary" Class="mt-3 d-block">
+            @TM("Current dynamic override: <strong>{0}</strong>", CurrentState)
+        </MudText>
+        <MudText Typo="Typo.caption" Color="global::MudBlazor.Color.Secondary" Class="d-block">
+            @T("Navigating to a different page automatically clears the override.")
+        </MudText>
+    </MudCardContent>
+</MudCard>

@@ -1,38 +1,32 @@
-@page "/projects/switcher"
 @rendermode InteractiveServer
 @inherits PageBase
 
-<h1>Project switcher</h1>
+<PageTitle>@T("Project switcher")</PageTitle>
+
+<MudText Typo="Typo.h3" GutterBottom="true">@T("Project switcher")</MudText>
 
 @if (Manager.Projects is { Count: > 0 } projects)
 {
-    <section class="card">
-        <h2>Pick one</h2>
-        <ul class="switcher">
-            @foreach (var p in projects)
-            {
-                <li>
-                    <button type="button"
-                            @onclick="() => SwitchTo(p.Id)"
-                            disabled="@(p.Id == Catalog.Project.Id)">
-                        @p.Name
-                    </button>
-                </li>
-            }
-        </ul>
-    </section>
+    <MudCard Outlined="true">
+        <MudCardContent>
+            <MudText Typo="Typo.h5" GutterBottom="true">@T("Pick one")</MudText>
+            <MudList T="Guid" Dense="true">
+                @foreach (var p in projects)
+                {
+                    var isCurrent = p.Id == Catalog.Project.Id;
+                    <MudListItem T="Guid" Disabled="@isCurrent" OnClick="@(() => SwitchTo(p.Id))">
+                        <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
+                            <MudIcon Icon="@(isCurrent ? Icons.Material.Filled.CheckCircle : Icons.Material.Outlined.Inventory2)"
+                                     Color="@(isCurrent ? global::MudBlazor.Color.Success : global::MudBlazor.Color.Default)" />
+                            <MudText>@p.Name</MudText>
+                        </MudStack>
+                    </MudListItem>
+                }
+            </MudList>
+        </MudCardContent>
+    </MudCard>
 }
 else
 {
-    <div class="alert">No projects under the current organization.</div>
-}
-
-@code {
-    [Inject] ICatalogManager Manager { get; set; } = default!;
-
-    async Task SwitchTo(Guid id)
-    {
-        await Manager.SwitchProjectAsync(id);
-        Toast.AddSuccess("Switched to {0}", Catalog.Project.Name.Value);
-    }
+    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">@T("No projects under the current organization.")</MudAlert>
 }

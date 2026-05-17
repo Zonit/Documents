@@ -1,77 +1,69 @@
-@page "/mudblazor/forms"
 @rendermode InteractiveServer
-@inherits PageBase
+@inherits PageEditBase<Extensions.MudBlazor.Models.FormModel>
+@using Extensions.MudBlazor.Models
+@using MudBlazor
 
 @*
-    MudBlazor assets and providers are scoped to THIS page only via <HeadContent>
-    + inline providers, so the heavy MudBlazor.min.css reset (which would otherwise
-    repaint <select>, body typography, etc.) doesn't leak into the rest of the demo.
-    Other pages keep their own `site.css`-driven styling untouched.
+    MudBlazor providers/assets are global on the /docs (dashboard) mount, so they are
+    NOT re-declared here. The home page on the public root mount keeps its own scoped
+    providers — see Documents.Website/Pages/Home.razor.
 *@
-<HeadContent>
-    <link rel="stylesheet" href="_content/MudBlazor/MudBlazor.min.css" />
-    <script src="_content/MudBlazor/MudBlazor.min.js"></script>
-</HeadContent>
 
-<MudThemeProvider />
-<MudPopoverProvider />
-<MudDialogProvider />
-<MudSnackbarProvider />
+<PageTitle>@T("MudBlazor + Zonit value objects")</PageTitle>
 
-<h1>MudBlazor + Zonit value objects</h1>
+<MudText Typo="global::MudBlazor.Typo.h3" GutterBottom="true">@T("MudBlazor + Zonit value objects")</MudText>
 
-<p>
-    <code>ZonitTextField&lt;T&gt;</code> and <code>ZonitTextArea&lt;T&gt;</code> wrap
-    <code>MudTextField</code> with a Value-Object-aware converter. <code>T</code> is
-    inferred from <code>@@bind-Value</code> — the consumer never spells it out.
-    Construction errors thrown by the VO (e.g. <code>Url("nope")</code>) are caught
-    and rendered as MudBlazor validation messages; the offending text is preserved so
-    the user can fix it in place.
-</p>
+<MudText Class="mb-4">
+    @TM("{0} and {1} wrap {2} with a Value-Object-aware converter. {3} is inferred from {4} — the consumer never spells it out. Construction errors thrown by the VO (e.g. {5}) are caught and rendered as MudBlazor validation messages; the offending text is preserved so the user can fix it in place.",
+        "<code>ZonitTextField&lt;T&gt;</code>",
+        "<code>ZonitTextArea&lt;T&gt;</code>",
+        "<code>MudTextField</code>",
+        "<code>T</code>",
+        "<code>@bind-Value</code>",
+        "<code>Url(\"nope\")</code>")
+</MudText>
 
-<MudPaper Class="pa-6" Elevation="2">
-    <EditForm Model="@_model" OnValidSubmit="OnValid">
+<MudAlert Severity="global::MudBlazor.Severity.Info" Variant="global::MudBlazor.Variant.Outlined" Class="mb-4">
+    @TM("This page derives from {0} — the framework supplies {1}, {2}, {3} tracking, duplicate-submit guard, and string trim/whitespace normalisation on submit. The page only overrides {4} (initial seed) and {5} (the save call).",
+        "<strong>PageEditBase&lt;FormModel&gt;</strong>",
+        "<code>Model</code>",
+        "<code>EditContext</code>",
+        "<code>HasChanges</code>",
+        "<code>LoadAsync</code>",
+        "<code>SubmitAsync</code>")
+</MudAlert>
+
+<MudPaper Class="pa-6 mb-6" Elevation="2">
+    <EditForm EditContext="@EditContext" OnValidSubmit="HandleValidSubmit" FormName="mud-vo-form">
         <DataAnnotationsValidator />
 
-        <ZonitTextField @bind-Value="_model.Title"       Label="Title"       Counter="0" />
-        <ZonitTextField @bind-Value="_model.Slug"        Label="URL slug"    HelperText="Lower-case, hyphens, ASCII." />
-        <ZonitTextField @bind-Value="_model.HomeUrl"     Label="Homepage"    OpenNewTab />
-        <ZonitTextArea  @bind-Value="_model.Description" Label="Description" Counter="0" Lines="3" />
+        <ZonitTextField @bind-Value="Model.Title"       Label="@T("Title")"       Counter="0" />
+        <ZonitTextField @bind-Value="Model.Slug"        Label="@T("URL slug")"    HelperText="@T("Lower-case, hyphens, ASCII.")" />
+        <ZonitTextField @bind-Value="Model.HomeUrl"     Label="@T("Homepage")"    OpenNewTab />
+        <ZonitTextArea  @bind-Value="Model.Description" Label="@T("Description")" Counter="0" Lines="3" />
 
-        @* MudBlazor enums are qualified with `global::MudBlazor.` because
-           `@@using Zonit.Extensions` (inherited from _Imports.razor) brings in a
-           `Color` VO that would otherwise shadow `MudBlazor.Color`. The Zonit
-           VO wins on simple-name lookup so we anchor the MudBlazor side. *@
-        <MudButton ButtonType="global::MudBlazor.ButtonType.Submit"
-                   Variant="global::MudBlazor.Variant.Filled"
-                   Color="global::MudBlazor.Color.Primary"
-                   Class="mt-4">
-            Save
-        </MudButton>
+        @* MudBlazor enums are qualified with global::MudBlazor. because @using Zonit.Extensions
+           (inherited from _Imports.razor) brings in a Color VO that would otherwise shadow
+           MudBlazor.Color. The Zonit VO wins on simple-name lookup so we anchor MudBlazor. *@
+        <MudStack Row="true" Spacing="2" AlignItems="global::MudBlazor.AlignItems.Center" Class="mt-4">
+            <MudButton ButtonType="global::MudBlazor.ButtonType.Submit"
+                       Variant="global::MudBlazor.Variant.Filled"
+                       Color="global::MudBlazor.Color.Primary"
+                       StartIcon="@(global::MudBlazor.Icons.Material.Filled.Save)"
+                       Disabled="@(!HasChanges || Processing)">
+                @(Processing ? T("Saving…") : T("Save"))
+            </MudButton>
+            <MudText Typo="global::MudBlazor.Typo.caption" Color="global::MudBlazor.Color.Secondary">
+                HasChanges: @HasChanges · IsValid: @IsValid
+            </MudText>
+        </MudStack>
     </EditForm>
 </MudPaper>
 
-<MudPaper Class="pa-6 mt-6" Elevation="1">
-    <MudText Typo="global::MudBlazor.Typo.h6">Current snapshot</MudText>
-    <pre>Title       -> "@_model.Title.Value" (length @_model.Title.Length / @Title.MaxLength)
-Slug        -> "@_model.Slug.Value"
-HomeUrl     -> "@_model.HomeUrl.Value" (abs: @_model.HomeUrl.IsAbsolute)
-Description -> "@_model.Description.Value" (length @_model.Description.Length / @Description.MaxLength)</pre>
+<MudPaper Class="pa-6" Elevation="1">
+    <MudText Typo="global::MudBlazor.Typo.h6" GutterBottom="true">@T("Current snapshot")</MudText>
+    <pre class="mud-elevation-1 pa-3" style="background:var(--mud-palette-background-grey);border-radius:4px;">@($@"Title       -> ""{Model.Title.Value}"" (length {Model.Title.Length} / {Title.MaxLength})
+Slug        -> ""{Model.Slug.Value}""
+HomeUrl     -> ""{Model.HomeUrl.Value}"" (abs: {Model.HomeUrl.IsAbsolute})
+Description -> ""{Model.Description.Value}"" (length {Model.Description.Length} / {Description.MaxLength})")</pre>
 </MudPaper>
-
-@code {
-    sealed class FormModel
-    {
-        public Title       Title       { get; set; } = "Hello Zonit";
-        public UrlSlug     Slug        { get; set; } = "hello-zonit";
-        public Url         HomeUrl     { get; set; } = "https://zonit.dev";
-        public Description Description { get; set; } = "Type something and watch the VO validate live.";
-    }
-
-    readonly FormModel _model = new();
-
-    void OnValid()
-    {
-        Toast.AddSuccess("Saved {0}", _model.Title.Value);
-    }
-}
