@@ -13,7 +13,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <base href="/" />
-    <link rel="stylesheet" href="@Assets["Example.styles.css"]" />
+    @* Scoped CSS bundle (`{AssemblyName}.styles.css`) is only emitted when the host
+       project or one of its referenced RCLs ships a *.razor.css file. Documents has
+       none, so referencing "Documents.styles.css" here would 404 → MIME error
+       ("Refused to apply style ... text/html is not a supported stylesheet MIME type").
+       Add the link back the moment a *.razor.css is introduced. *@
     <link rel="stylesheet" href="site.css" />
     <link rel="icon" type="image/png" href="@(Tenant.Settings.Site.FaviconUrl ?? "favicon.png")" />
     <title>@Tenant.Settings.Site.Title</title>

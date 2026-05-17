@@ -24,7 +24,14 @@
                     {
                         if (!IsAllowed(link)) continue;
                         <li>
-                            <NavLink href="@link.Url.Value" Match="@(link.Match ? NavLinkMatch.All : NavLinkMatch.Prefix)">
+                            @* ToHref() strips the leading slash so the emitted href is
+                               relative to the active <base href>. On the root site
+                               (base="/") an absolute and a relative path resolve to
+                               the same place — but the moment this host is mounted
+                               under a non-root prefix the absolute form would bypass
+                               path-base entirely. See Zonit.Extensions.Website
+                               UrlPathRendering.ToHref. *@
+                            <NavLink href="@link.Url.ToHref()" Match="@(link.Match ? NavLinkMatch.All : NavLinkMatch.Prefix)">
                                 @link.Title.Value
                             </NavLink>
                         </li>
